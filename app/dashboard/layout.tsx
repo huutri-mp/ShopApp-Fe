@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
+import { useAuth } from "@/hooks/data/useAuth"
 import DashboardHeader from "@/app/components/DashboardHeader"
 import { Spinner } from "@/components/ui/spinner"
 

@@ -2,62 +2,77 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, use } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/hooks/data/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
 
 export default function RegisterPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [formData, setFormData] = useState({
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  
+  const { register, isLoading, isAuthenticated } = useAuth()
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/dashboard")
+    }
+  }, [isAuthenticated, router])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    // Clear error when user starts typing
+    if (error) setError("")
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setError("")
 
-    try {
-      if (!name || !email || !password || !confirmPassword) {
-        setError("Please fill in all fields")
-        setIsLoading(false)
-        return
-      }
+    if (!formData.userName || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError("Please fill in all fields")
+      return
+    }
 
-      if (password !== confirmPassword) {
-        setError("Passwords do not match")
-        setIsLoading(false)
-        return
-      }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
 
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters")
-        setIsLoading(false)
-        return
-      }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters")
+      return
+    }
 
-      // Mock registration - replace with real API call
-      localStorage.setItem("auth_token", "mock_token_" + Date.now())
-      localStorage.setItem("user_email", email)
-      localStorage.setItem("user_name", name)
+    const result = await register({
+      email: formData.email,
+      userName: formData.userName,
+      password: formData.password,
+    })
+    
+    if (result.success) {
       router.push("/dashboard")
-    } catch (err) {
-      setError("Registration failed. Please try again.")
-    } finally {
-      setIsLoading(false)
+    } else {
+      setError(result.message || "Registration failed. Please try again.")
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create Account</CardTitle>
@@ -73,10 +88,11 @@ export default function RegisterPage() {
               </label>
               <Input
                 id="name"
+                name="name"
                 type="text"
                 placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formData.userName}
+                onChange={handleChange}
                 disabled={isLoading}
               />
             </div>
@@ -87,10 +103,11 @@ export default function RegisterPage() {
               </label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
                 disabled={isLoading}
               />
             </div>
@@ -102,10 +119,11 @@ export default function RegisterPage() {
               <div className="relative">
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
                   disabled={isLoading}
                 />
                 <button
@@ -124,15 +142,17 @@ export default function RegisterPage() {
               </label>
               <Input
                 id="confirm-password"
+                name="confirmPassword"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 disabled={isLoading}
               />
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Spinner className="mr-2" /> : null}
               {isLoading ? "Creating account..." : "Register"}
             </Button>
           </form>

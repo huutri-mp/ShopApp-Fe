@@ -4,7 +4,7 @@ import { useState, use } from "react"
 import Link from "next/link"
 import { Star, ShoppingCart, ChevronLeft, Heart, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useProducts } from "@/hooks/useProducts"
+import { useProducts } from "@/hooks/data/useProducts"
 
 export default function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const [quantity, setQuantity] = useState(1)
@@ -42,7 +42,7 @@ export default function ProductDetail({ params }: { params: Promise<{ id: string
       // Show success feedback (you could add a toast here)
       alert("Product added to cart!")
     } catch (error) {
-      console.error("Error adding to cart:", error)
+      // Error adding to cart handled silently
       alert("Failed to add product to cart")
     } finally {
       setIsLoading(false)

@@ -10,7 +10,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useProducts, type Product } from "@/hooks/useProducts"
+import { useProducts, type Product } from "@/hooks/data/useProducts"
 import { Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 
