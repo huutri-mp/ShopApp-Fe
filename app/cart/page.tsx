@@ -1,29 +1,35 @@
-"use client"
+"use client";
 
-import { ShoppingCart } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { useState, useEffect } from "react"
+import { ShoppingCart } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState([])
-  const [total, setTotal] = useState(0)
+  const [cartItems, setCartItems] = useState([]);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]")
-    setCartItems(cart)
-    const sum = cart.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0)
-    setTotal(sum)
-  }, [])
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    setCartItems(cart);
+    const sum = cart.reduce(
+      (acc: number, item: any) => acc + item.price * item.quantity,
+      0
+    );
+    setTotal(sum);
+  }, []);
 
   const removeItem = (productId: string) => {
-    const updatedCart = cartItems.filter((item: any) => item.id !== productId)
-    setCartItems(updatedCart)
-    localStorage.setItem("cart", JSON.stringify(updatedCart))
-    const sum = updatedCart.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0)
-    setTotal(sum)
-  }
+    const updatedCart = cartItems.filter((item: any) => item.id !== productId);
+    setCartItems(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const sum = updatedCart.reduce(
+      (acc: number, item: any) => acc + item.price * item.quantity,
+      0
+    );
+    setTotal(sum);
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -31,7 +37,9 @@ export default function CartPage() {
         <div className="container mx-auto px-4">
           <div className="text-center py-20">
             <ShoppingCart size={64} className="mx-auto text-gray-300 mb-4" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              Your cart is empty
+            </h1>
             <p className="text-gray-600 mb-8">Add products to get started</p>
             <Link href="/">
               <Button>Continue Shopping</Button>
@@ -39,7 +47,7 @@ export default function CartPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -54,10 +62,15 @@ export default function CartPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-bold text-lg">{item.name}</h3>
-                    <p className="text-red-600 font-bold text-xl mt-2">${item.price}</p>
+                    <p className="text-red-600 font-bold text-xl mt-2">
+                      ${item.price}
+                    </p>
                     <p className="text-gray-600">Qty: {item.quantity}</p>
                   </div>
-                  <Button variant="destructive" onClick={() => removeItem(item.id)}>
+                  <Button
+                    variant="destructive"
+                    onClick={() => removeItem(item.id)}
+                  >
                     Remove
                   </Button>
                 </div>
@@ -83,11 +96,13 @@ export default function CartPage() {
                   <span>${(total + 10).toFixed(2)}</span>
                 </div>
               </div>
-              <Button className="w-full bg-red-600 hover:bg-red-700">Checkout</Button>
+              <Button className="w-full bg-red-600 hover:bg-red-700">
+                Checkout
+              </Button>
             </Card>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

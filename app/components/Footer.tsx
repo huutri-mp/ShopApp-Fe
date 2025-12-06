@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Instagram } from "lucide-react"
+import { Facebook, Twitter, Instagram } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -13,11 +13,7 @@ export default function Footer() {
               </div>
               <span className="text-xl font-bold text-gray-900">Shops</span>
             </div>
-            <p className="text-gray-600 text-sm">
-              Qui viedi enet mardlim
-              <br />
-              gecmetilor.mie.gim
-            </p>
+            <p className="text-gray-600 text-sm"></p>
           </div>
 
           {/* Quick Links */}
@@ -25,12 +21,18 @@ export default function Footer() {
             <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-gray-900 text-sm"
+                >
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-gray-900 text-sm">
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-gray-900 text-sm"
+                >
                   Order Tracking
                 </a>
               </li>
@@ -42,7 +44,7 @@ export default function Footer() {
             <h3 className="font-semibold text-gray-900 mb-4">Contact</h3>
             <div className="space-y-2 text-sm">
               <p className="text-gray-600">support@example.com</p>
-              <p className="text-gray-600">+1 (123).456-7890</p>
+              <p className="text-gray-600">+84 (123).456-7890</p>
             </div>
             {/* Social icons */}
             <div className="flex gap-4 mt-6">
@@ -60,5 +62,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

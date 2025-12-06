@@ -1,5 +1,5 @@
-"use client"
-import { Button } from "@/components/ui/button"
+"use client";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,17 +9,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { useProducts, type Product } from "@/hooks/data/useProducts"
-import { Edit, Trash2 } from "lucide-react"
-import Link from "next/link"
+} from "@/components/ui/alert-dialog";
+import { useProducts, type Product } from "@/hooks/data/useProducts";
+import { Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 interface ProductDataTableProps {
-  products: Product[]
+  products: Product[];
 }
 
 export default function ProductDataTable({ products }: ProductDataTableProps) {
-  const { deleteProduct } = useProducts()
+  const { deleteProduct } = useProducts();
 
   return (
     <div className="overflow-x-auto">
@@ -37,33 +37,47 @@ export default function ProductDataTable({ products }: ProductDataTableProps) {
         <tbody>
           {products.length === 0 ? (
             <tr>
-              <td colSpan={6} className="text-center py-6 text-muted-foreground">
+              <td
+                colSpan={6}
+                className="text-center py-6 text-muted-foreground"
+              >
                 No products found
               </td>
             </tr>
           ) : (
             products.map((product) => (
-              <tr key={product.id} className="border-b border-border hover:bg-muted/50">
+              <tr
+                key={product.id}
+                className="border-b border-border hover:bg-muted/50"
+              >
                 <td className="py-3 px-4 font-medium">{product.name}</td>
                 <td className="py-3 px-4">{product.category}</td>
-                <td className="py-3 px-4 text-right font-semibold text-red-600">${product.price.toFixed(2)}</td>
+                <td className="py-3 px-4 text-right font-semibold text-red-600">
+                  ${product.price.toFixed(2)}
+                </td>
                 <td className="py-3 px-4 text-right">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${
                       product.stock > 10
                         ? "bg-green-100 text-green-800"
                         : product.stock > 0
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
                     }`}
                   >
                     {product.stock}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-center text-amber-500 font-semibold">{product.rating.toFixed(1)}/5</td>
+                <td className="py-3 px-4 text-center text-amber-500 font-semibold">
+                  {product.rating.toFixed(1)}/5
+                </td>
                 <td className="py-3 px-4 text-right flex justify-end gap-2">
                   <Link href={`/dashboard/products/${product.id}/edit`}>
-                    <Button variant="outline" size="sm" className="gap-1 bg-transparent">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1 bg-transparent"
+                    >
                       <Edit size={16} />
                       Edit
                     </Button>
@@ -80,7 +94,8 @@ export default function ProductDataTable({ products }: ProductDataTableProps) {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Product</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete "{product.name}"? This action cannot be undone.
+                          Are you sure you want to delete "{product.name}"? This
+                          action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <div className="flex gap-2 justify-end">
@@ -101,5 +116,5 @@ export default function ProductDataTable({ products }: ProductDataTableProps) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }

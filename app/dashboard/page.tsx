@@ -1,35 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useProducts } from "@/hooks/data/useProducts"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useProducts } from "@/hooks/data/useProducts";
 // import { useUsers } from "@/hooks/useUsers"
 // import { useCategories } from "@/hooks/useCategories"
-import { Plus, Package, DollarSign, Users, Grid2X2 } from "lucide-react"
-import ProductDataTable from "@/app/components/ProductDataTable"
+import { Plus, Package, DollarSign, Users, Grid2X2 } from "lucide-react";
+import ProductDataTable from "@/app/components/ProductDataTable";
 // import UserDataTable from "@/app/components/UserDataTable"
 // import CategoryDataTable from "@/app/components/CategoryDataTable"
 
 export default function DashboardPage() {
-  const { products } = useProducts()
+  const { products } = useProducts();
   // const { users } = useUsers()
   // const { categories } = useCategories()
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const totalRevenue = products.reduce((sum, p) => sum + p.price * (p.stock || 0), 0)
-  const totalProducts = products.length
-  const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0)
-  const averageRating = (products.reduce((sum, p) => sum + p.rating, 0) / products.length).toFixed(1)
+  const totalRevenue = products.reduce(
+    (sum, p) => sum + p.price * (p.stock || 0),
+    0
+  );
+  const totalProducts = products.length;
+  const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
+  const averageRating = (
+    products.reduce((sum, p) => sum + p.rating, 0) / products.length
+  ).toFixed(1);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Manage products, users, and categories</p>
+          <p className="text-muted-foreground mt-1">
+            Manage products, users, and categories
+          </p>
         </div>
         <Link href="/dashboard/products/new">
           <Button className="gap-2">
@@ -49,7 +62,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground mt-1">Total inventory value</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Total inventory value
+            </p>
           </CardContent>
         </Card>
 
@@ -62,7 +77,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalProducts}</div>
-            <p className="text-xs text-muted-foreground mt-1">Active products</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Active products
+            </p>
           </CardContent>
         </Card>
 
@@ -75,7 +92,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {/* <div className="text-2xl font-bold">{users.length}</div> */}
-            <p className="text-xs text-muted-foreground mt-1">Registered users</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Registered users
+            </p>
           </CardContent>
         </Card>
 
@@ -88,7 +107,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {/* <div className="text-2xl font-bold">{categories.length}</div> */}
-            <p className="text-xs text-muted-foreground mt-1">Product categories</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Product categories
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -96,7 +117,9 @@ export default function DashboardPage() {
       <Card>
         <CardHeader>
           <CardTitle>Management Dashboard</CardTitle>
-          <CardDescription>Manage products, users, and categories</CardDescription>
+          <CardDescription>
+            Manage products, users, and categories
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="products" className="w-full">
@@ -129,7 +152,7 @@ export default function DashboardPage() {
                 products={products.filter(
                   (p) =>
                     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    p.category.toLowerCase().includes(searchTerm.toLowerCase()),
+                    p.category.toLowerCase().includes(searchTerm.toLowerCase())
                 )}
               />
             </TabsContent>
@@ -162,5 +185,5 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

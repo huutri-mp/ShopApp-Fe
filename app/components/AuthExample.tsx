@@ -1,24 +1,30 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/hooks/data/useAuth"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
+import { useAuth } from "@/hooks/data/useAuth";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export function AuthExample() {
-  const { 
-    user, 
-    isAuthenticated, 
-    isLoading, 
-    logout, 
+  const {
+    user,
+    isAuthenticated,
+    isLoading,
+    logout,
     needsPasswordCreation,
     loginWithGoogle,
-    loginWithFacebook
-  } = useAuth()
+    loginWithFacebook,
+  } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
@@ -34,9 +40,11 @@ export function AuthExample() {
           <Link href="/auth/login">
             <Button className="w-full">Login with Email</Button>
           </Link>
-          
+
           <Link href="/auth/register">
-            <Button variant="outline" className="w-full">Register</Button>
+            <Button variant="outline" className="w-full">
+              Register
+            </Button>
           </Link>
 
           <Separator />
@@ -54,22 +62,26 @@ export function AuthExample() {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Welcome, {user?.name || user?.userName}</CardTitle>
-        <CardDescription>
-          You are successfully authenticated
-        </CardDescription>
+        <CardDescription>You are successfully authenticated</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-sm space-y-1">
-          <p><strong>User Name:</strong> {user?.userName}</p>
-          <p><strong>Name:</strong> {user?.name || 'Not provided'}</p>
-          <p><strong>Provider:</strong> {user?.provider || 'local'}</p>
+          <p>
+            <strong>User Name:</strong> {user?.userName}
+          </p>
+          <p>
+            <strong>Name:</strong> {user?.name || "Not provided"}
+          </p>
+          <p>
+            <strong>Provider:</strong> {user?.provider || "local"}
+          </p>
         </div>
 
         <Separator />
@@ -82,7 +94,7 @@ export function AuthExample() {
               </Button>
             </Link>
           )}
-          
+
           {!needsPasswordCreation() && (
             <Link href="/auth/change-password">
               <Button variant="outline" className="w-full">
@@ -90,16 +102,12 @@ export function AuthExample() {
               </Button>
             </Link>
           )}
-          
-          <Button 
-            variant="destructive" 
-            className="w-full"
-            onClick={logout}
-          >
+
+          <Button variant="destructive" className="w-full" onClick={logout}>
             Logout
           </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

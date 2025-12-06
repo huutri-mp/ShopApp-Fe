@@ -1,84 +1,89 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/data/useAuth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert } from "@/components/ui/alert"
-import { Spinner } from "@/components/ui/spinner"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/data/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert } from "@/components/ui/alert";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function ChangePasswordPage() {
-  const { changePassword, isLoading, isAuthenticated } = useAuth()
-  const router = useRouter()
+  const { changePassword, isLoading } = useAuth();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-  })
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-
-  // Redirect if not authenticated
-  if (!isAuthenticated && !isLoading) {
-    router.replace("/auth/login")
-    return null
-  }
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear errors when user starts typing
-    if (error) setError(null)
-    if (success) setSuccess(null)
-  }
+    if (error) setError(null);
+    if (success) setSuccess(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setSuccess(null)
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
 
     // Validation
-    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
-      setError("All fields are required")
-      return
+    if (
+      !formData.currentPassword ||
+      !formData.newPassword ||
+      !formData.confirmPassword
+    ) {
+      setError("All fields are required");
+      return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      setError("New passwords do not match")
-      return
+      setError("New passwords do not match");
+      return;
     }
 
     if (formData.newPassword.length < 6) {
-      setError("New password must be at least 6 characters long")
-      return
+      setError("New password must be at least 6 characters long");
+      return;
     }
 
     const result = await changePassword({
       currentPassword: formData.currentPassword,
       newPassword: formData.newPassword,
-    })
+    });
 
-    if (result.success) {
-      setSuccess(result.message || "Password changed successfully")
-      setFormData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      })
-    } else {
-      setError(result.message || "Failed to change password")
-    }
-  }
+    // if (result.success) {
+    //   setSuccess(result.message || "Password changed successfully");
+    //   setFormData({
+    //     currentPassword: "",
+    //     newPassword: "",
+    //     confirmPassword: "",
+    //   });
+    // } else {
+    //   setError(result.message || "Failed to change password");
+    // }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spinner />
       </div>
-    )
+    );
   }
 
   return (
@@ -102,7 +107,7 @@ export default function ChangePasswordPage() {
                 <p>{success}</p>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="currentPassword">Current Password</Label>
               <Input
@@ -115,7 +120,7 @@ export default function ChangePasswordPage() {
                 disabled={isLoading}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
               <Input
@@ -128,7 +133,7 @@ export default function ChangePasswordPage() {
                 disabled={isLoading}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <Input
@@ -142,13 +147,13 @@ export default function ChangePasswordPage() {
               />
             </div>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? <Spinner className="mr-2" /> : null}
               Change Password
             </Button>
-            
+
             <Button
               type="button"
               variant="outline"
@@ -162,5 +167,5 @@ export default function ChangePasswordPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }

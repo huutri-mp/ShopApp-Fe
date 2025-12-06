@@ -1,54 +1,57 @@
-"use client"
+"use client";
 
 export interface Filters {
-  priceRange: [number, number]
-  rating: number | null
-  category: string | null
+  priceRange: [number, number];
+  rating: number | null;
+  category: string | null;
 }
 
 interface FilterSidebarProps {
-  filters: Filters
-  setFilters: (filters: Filters) => void
+  filters: Filters;
+  setFilters: (filters: Filters) => void;
 }
 
-export default function FilterSidebar({ filters, setFilters }: FilterSidebarProps) {
+export default function FilterSidebar({
+  filters,
+  setFilters,
+}: FilterSidebarProps) {
   const categories = [
     { value: "all", label: "All" },
     { value: "electronics", label: "Electronics" },
     { value: "accessories", label: "Accessories" },
     { value: "audio", label: "Audio" },
     { value: "power", label: "Smart Devices" },
-  ]
-  const ratings = [5, 4, 3, 2, 1]
+  ];
+  const ratings = [5, 4, 3, 2, 1];
 
   const handlePriceChange = (type: "min" | "max", value: number) => {
-    const [min, max] = filters.priceRange
+    const [min, max] = filters.priceRange;
     if (type === "min") {
       setFilters({
         ...filters,
         priceRange: [value, max],
-      })
+      });
     } else {
       setFilters({
         ...filters,
         priceRange: [min, value],
-      })
+      });
     }
-  }
+  };
 
   const handleRatingChange = (rating: number) => {
     setFilters({
       ...filters,
       rating: filters.rating === rating ? null : rating,
-    })
-  }
+    });
+  };
 
   const handleCategoryChange = (category: string) => {
     setFilters({
       ...filters,
       category,
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-8">
@@ -104,7 +107,9 @@ export default function FilterSidebar({ filters, setFilters }: FilterSidebarProp
                 onChange={() => handleRatingChange(rating)}
                 className="w-5 h-5 rounded border-gray-300 text-red-600 accent-red-600"
               /> */}
-              <span className="ml-3 text-sm text-gray-700">{rating} stars & up</span>
+              <span className="ml-3 text-sm text-gray-700">
+                {rating} stars & up
+              </span>
             </label>
           ))}
         </div>
@@ -132,11 +137,13 @@ export default function FilterSidebar({ filters, setFilters }: FilterSidebarProp
 
       {/* Reset button */}
       <button
-        onClick={() => setFilters({ priceRange: [0, 500], rating: null, category: null })}
+        onClick={() =>
+          setFilters({ priceRange: [0, 500], rating: null, category: null })
+        }
         className="w-full text-red-600 font-semibold text-sm hover:text-red-700 transition-colors"
       >
         Reset filters
       </button>
     </div>
-  )
+  );
 }

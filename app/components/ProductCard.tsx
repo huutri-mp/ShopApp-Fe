@@ -1,16 +1,16 @@
-import { Star } from "lucide-react"
-import Link from "next/link"
+import { Star } from "lucide-react";
+import Link from "next/link";
 
 interface Product {
-  id: string
-  name: string
-  price: number
-  rating: number
-  reviews: number
-  image: string
-  category: string
-  stock: number
-  discount?: number
+  id: string;
+  name: string;
+  price: number;
+  rating: number;
+  reviews: number;
+  image: string;
+  category: string;
+  stock: number;
+  discount?: number;
 }
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -20,7 +20,10 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Image container */}
         <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 aspect-square overflow-hidden">
           <img
-            src={product.image || "/placeholder.svg?height=300&width=300&query=product"}
+            src={
+              product.image ||
+              "/placeholder.svg?height=300&width=300&query=product"
+            }
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           />
@@ -40,7 +43,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Content */}
         <div className="p-5">
-          <h3 className="text-base font-semibold text-gray-900 line-clamp-2 mb-3">{product.name}</h3>
+          <h3 className="text-base font-semibold text-gray-900 line-clamp-2 mb-3">
+            {product.name}
+          </h3>
 
           {/* Rating */}
           <div className="flex items-center gap-2 mb-4">
@@ -49,18 +54,28 @@ export default function ProductCard({ product }: { product: Product }) {
                 <Star
                   key={i}
                   size={16}
-                  className={i < Math.round(product.rating) ? "fill-amber-400 text-amber-400" : "text-gray-300"}
+                  className={
+                    i < Math.round(product.rating)
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-gray-300"
+                  }
                 />
               ))}
             </div>
-            <span className="text-xs text-gray-600 font-medium">{product.reviews}</span>
+            <span className="text-xs text-gray-600 font-medium">
+              {product.reviews}
+            </span>
           </div>
 
           {/* Price */}
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xl font-bold text-red-600">${product.price}</span>
+            <span className="text-xl font-bold text-red-600">
+              ${product.price}
+            </span>
             {product.discount && (
-              <span className="text-sm text-green-600 font-semibold">-{product.discount}%</span>
+              <span className="text-sm text-green-600 font-semibold">
+                -{product.discount}%
+              </span>
             )}
           </div>
 
@@ -71,5 +86,5 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
     </Link>
-  )
+  );
 }

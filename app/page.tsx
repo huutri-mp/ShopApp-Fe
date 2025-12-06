@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search } from "lucide-react"
-import Hero from "./components/Hero"
-import ProductGrid from "./components/ProductGrid"
-import FilterSidebar from "./components/FilterSidebar"
+import { useState } from "react";
+import { Search } from "lucide-react";
+import Hero from "./components/Hero";
+import ProductGrid from "./components/ProductGrid";
+import FilterSidebar from "./components/FilterSidebar";
 
 interface Filters {
-  priceRange: [number, number]
-  rating: number
-  category: string
+  priceRange: [number, number];
+  rating: number;
+  category: string;
 }
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<Filters>({
     priceRange: [0, 500],
     rating: 0,
     category: "all",
-  })
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,7 +45,10 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
-            <FilterSidebar selectedFilters={filters} setSelectedFilters={setFilters} />
+            <FilterSidebar
+              selectedFilters={filters}
+              setSelectedFilters={setFilters}
+            />
           </div>
           <div className="md:col-span-3">
             <ProductGrid searchQuery={searchQuery} />
@@ -53,5 +56,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
+  );
 }

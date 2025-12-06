@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search } from "lucide-react"
-import Header from "../components/Header"
-import Footer from "../components/Footer"
-import ProductCard from "../components/ProductCard"
-import FilterSidebar, { type Filters } from "../components/FilterSidebar"
+import { useState } from "react";
+import { Search } from "lucide-react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import ProductCard from "../components/ProductCard";
+import FilterSidebar, { type Filters } from "../components/FilterSidebar";
 
 const dummyProducts = [
   {
@@ -92,32 +92,34 @@ const dummyProducts = [
     image: "/screen-protector.png",
     discount: 35,
   },
-]
+];
 
 export default function ProductsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<Filters>({
     priceRange: [0, 500],
     rating: 0,
     category: "all",
-  })
+  });
 
   const filteredProducts = dummyProducts.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-
       {/* Main content */}
       <main className="flex-1 container mx-auto py-12 px-4 lg:px-8">
         {/* Banner section */}
         <div className="mb-16 rounded-3xl overflow-hidden shadow-lg bg-gradient-to-r from-rose-200 via-pink-100 to-slate-300 relative">
           <div className="p-12 flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="flex-1">
-              <h1 className="text-5xl lg:text-6xl font-black text-gray-900 mb-4">Winter Sale</h1>
+              <h1 className="text-5xl lg:text-6xl font-black text-gray-900 mb-4">
+                Winter Sale
+              </h1>
               <p className="text-xl text-gray-800 mb-8">
-                Up to <span className="text-red-600 font-bold text-2xl">50% off</span>
+                Up to{" "}
+                <span className="text-red-600 font-bold text-2xl">50% off</span>
               </p>
               <button className="bg-white hover:bg-gray-100 text-gray-900 font-semibold px-8 py-3 rounded-xl transition-colors">
                 Shop now →
@@ -150,7 +152,10 @@ export default function ProductsPage() {
           {/* Sidebar */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
             <div className="sticky top-8">
-              <FilterSidebar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+              <FilterSidebar
+                selectedFilters={selectedFilters}
+                setSelectedFilters={setSelectedFilters}
+              />
             </div>
           </aside>
 
@@ -160,7 +165,9 @@ export default function ProductsPage() {
             <div className="mb-12 pb-6 border-b border-gray-200">
               <h2 className="text-3xl font-bold text-gray-900">
                 All Products
-                <span className="text-gray-500 font-normal text-xl ml-3">({filteredProducts.length} results)</span>
+                <span className="text-gray-500 font-normal text-xl ml-3">
+                  ({filteredProducts.length} results)
+                </span>
               </h2>
             </div>
 
@@ -174,14 +181,17 @@ export default function ProductsPage() {
             {/* Empty state */}
             {filteredProducts.length === 0 && (
               <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-gray-300 mt-12">
-                <p className="text-gray-700 text-2xl font-bold mb-2">Oops! No products found.</p>
-                <p className="text-gray-500">Please try adjusting your filters or search terms.</p>
+                <p className="text-gray-700 text-2xl font-bold mb-2">
+                  Oops! No products found.
+                </p>
+                <p className="text-gray-500">
+                  Please try adjusting your filters or search terms.
+                </p>
               </div>
             )}
           </div>
         </div>
       </main>
-
     </div>
-  )
+  );
 }

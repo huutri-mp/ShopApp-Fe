@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import ProductCard from "./ProductCard"
+import { useState, useMemo } from "react";
+import ProductCard from "./ProductCard";
 
 const PRODUCTS = [
   {
@@ -70,12 +70,12 @@ const PRODUCTS = [
     image: "/fast-charging-usb-c-adapter.jpg",
     category: "Electronics",
   },
-]
+];
 
 interface Filters {
-  priceRange: [number, number]
-  rating: number | null
-  category: string | null
+  priceRange: [number, number];
+  rating: number | null;
+  category: string | null;
 }
 
 export default function ProductGrid({ searchQuery }: { searchQuery: string }) {
@@ -83,23 +83,27 @@ export default function ProductGrid({ searchQuery }: { searchQuery: string }) {
     priceRange: [0, 500],
     rating: null,
     category: null,
-  })
+  });
 
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter((product) => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesPrice = product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
-      const matchesRating = !filters.rating || product.rating >= filters.rating
-      const matchesCategory = !filters.category || product.category === filters.category
+      const matchesSearch = product.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesPrice =
+        product.price >= filters.priceRange[0] &&
+        product.price <= filters.priceRange[1];
+      const matchesRating = !filters.rating || product.rating >= filters.rating;
+      const matchesCategory =
+        !filters.category || product.category === filters.category;
 
-      return matchesSearch && matchesPrice && matchesRating && matchesCategory
-    })
-  }, [searchQuery, filters])
+      return matchesSearch && matchesPrice && matchesRating && matchesCategory;
+    });
+  }, [searchQuery, filters]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-16">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-
         {/* Products */}
         <div className="md:col-span-3">
           <div className="mb-8 border-b border-border pb-4 flex justify-between items-center">
@@ -119,11 +123,13 @@ export default function ProductGrid({ searchQuery }: { searchQuery: string }) {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">No products found matching your criteria.</p>
+              <p className="text-muted-foreground text-lg">
+                No products found matching your criteria.
+              </p>
             </div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }

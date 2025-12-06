@@ -1,15 +1,17 @@
-"use client"
-
-import { isOAuthConfigured } from "@/config/oauth"
-import { Button } from "@/components/ui/button"
+"use client";
+import { Button } from "@/components/ui/button";
 
 interface OAuthButtonsProps {
-  onGoogleLogin: () => void
-  onFacebookLogin: () => void
-  isLoading?: boolean
+  onGoogleLogin: () => void;
+  onFacebookLogin: () => void;
+  isLoading?: boolean;
 }
 
-export function OAuthButtons({ onGoogleLogin, onFacebookLogin, isLoading }: OAuthButtonsProps) {
+export function OAuthButtons({
+  onGoogleLogin,
+  onFacebookLogin,
+  isLoading,
+}: OAuthButtonsProps) {
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -17,20 +19,20 @@ export function OAuthButtons({ onGoogleLogin, onFacebookLogin, isLoading }: OAut
           <div className="w-full border-t border-muted-foreground/20"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-background text-muted-foreground">Or continue with</span>
+          <span className="px-2 bg-background text-muted-foreground">
+            Or continue with
+          </span>
         </div>
       </div>
-
-
 
       <div className="grid grid-cols-2 gap-3">
         <Button
           type="button"
           variant="outline"
           onClick={onGoogleLogin}
-          disabled={isLoading || !isOAuthConfigured.google}
+          disabled={isLoading}
           className="w-full"
-          title={!isOAuthConfigured.google ? "Google OAuth not configured" : "Login with Google"}
+          title={!isLoading ? "Login with Google" : "Loading..."}
         >
           <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
             <path
@@ -52,14 +54,14 @@ export function OAuthButtons({ onGoogleLogin, onFacebookLogin, isLoading }: OAut
           </svg>
           Google
         </Button>
-        
+
         <Button
           type="button"
           variant="outline"
           onClick={onFacebookLogin}
-          disabled={isLoading || !isOAuthConfigured.facebook}
+          disabled={isLoading}
           className="w-full"
-          title={!isOAuthConfigured.facebook ? "Facebook OAuth not configured" : "Login with Facebook"}
+          title={!isLoading ? "Login with Facebook" : "Loading..."}
         >
           <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
             <path
@@ -71,5 +73,5 @@ export function OAuthButtons({ onGoogleLogin, onFacebookLogin, isLoading }: OAut
         </Button>
       </div>
     </div>
-  )
+  );
 }

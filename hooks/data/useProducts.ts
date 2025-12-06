@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
+import { useState, useCallback } from "react";
 
 export interface Product {
-  id: string
-  name: string
-  price: number
-  description: string
-  category: string
-  stock: number
-  rating: number
-  reviews: number
-  image: string
-  discount?: number
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  stock: number;
+  rating: number;
+  reviews: number;
+  image: string;
+  discount?: number;
 }
 
 export function useProducts() {
@@ -41,31 +41,33 @@ export function useProducts() {
       image: "/modern-smartwatch.png",
       discount: 15,
     },
-  ])
+  ]);
 
   const addProduct = useCallback((newProduct: Omit<Product, "id">) => {
     const product: Product = {
       ...newProduct,
       id: Date.now().toString(),
-    }
-    setProducts((prev) => [product, ...prev])
-    return product
-  }, [])
+    };
+    setProducts((prev) => [product, ...prev]);
+    return product;
+  }, []);
 
   const updateProduct = useCallback((id: string, updates: Partial<Product>) => {
-    setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)))
-  }, [])
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
+    );
+  }, []);
 
   const deleteProduct = useCallback((id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id))
-  }, [])
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+  }, []);
 
   const getProductById = useCallback(
     (id: string) => {
-      return products.find((p) => p.id === id)
+      return products.find((p) => p.id === id);
     },
-    [products],
-  )
+    [products]
+  );
 
   return {
     products,
@@ -73,5 +75,5 @@ export function useProducts() {
     updateProduct,
     deleteProduct,
     getProductById,
-  }
+  };
 }

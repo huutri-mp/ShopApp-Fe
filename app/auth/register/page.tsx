@@ -1,16 +1,30 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, use } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/data/useAuth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Eye, EyeOff } from "lucide-react"
-import { Spinner } from "@/components/ui/spinner"
+import { useState, useEffect, use } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/data/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Eye, EyeOff } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -18,77 +32,110 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
-  const router = useRouter()
-  
-  const { register, isLoading, isAuthenticated } = useAuth()
+    fullName: "",
+    dateOfBirth: "",
+    phoneNumber: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Redirect if already authenticated
+  const { register, isLoading, isAuthenticated } = useAuth();
+
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/dashboard")
+      router.replace("/dashboard");
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
-    if (error) setError("")
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (error) setError("");
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
-    if (!formData.userName || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError("Please fill in all fields")
-      return
+    if (
+      !formData.userName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (!formData.fullName || !formData.dateOfBirth || !formData.phoneNumber) {
+      setError("Please fill in full name, date of birth, and phone number");
+      return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters")
-      return
+      setError("Password must be at least 6 characters");
+      return;
     }
 
-    const result = await register({
-      email: formData.email,
-      userName: formData.userName,
-      password: formData.password,
-    })
-    
-    if (result.success) {
-      router.push("/dashboard")
-    } else {
-      setError(result.message || "Registration failed. Please try again.")
+    try {
+      const response = await register({
+        email: formData.email,
+        userName: formData.userName,
+        password: formData.password,
+        fullName: formData.fullName,
+        dateOfBirth: formData.dateOfBirth,
+        phoneNumber: formData.phoneNumber,
+      });
+
+      if (response?.status === 200) {
+        const data = response.data;
+        if (data && data.success === false) {
+          setError(data.message || "Registration failed");
+          return;
+        }
+
+        setSuccessMessage(data?.message || "Tạo thành công");
+        setDialogOpen(true);
+      } else {
+        setError(response?.data?.message || `Registration failed with status`);
+      }
+    } catch (err: any) {
+      setError(err?.message || "Registration failed. Please try again.");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>Register to start managing your products</CardDescription>
+          <CardDescription>
+            Register to start managing your products
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">
-            {error && <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm">{error}</div>}
+            {error && (
+              <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
             <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Full Name
+              <label htmlFor="userName" className="text-sm font-medium">
+                User Name
               </label>
               <Input
-                id="name"
-                name="name"
+                id="userName"
+                name="userName"
                 type="text"
                 placeholder="John Doe"
                 value={formData.userName}
@@ -107,6 +154,50 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={formData.email}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="fullName" className="text-sm font-medium">
+                Full Name
+              </label>
+              <Input
+                id="fullName"
+                name="fullName"
+                type="text"
+                placeholder="John Doe"
+                value={formData.fullName}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="dateOfBirth" className="text-sm font-medium">
+                Date of Birth
+              </label>
+              <Input
+                id="dateOfBirth"
+                name="dateOfBirth"
+                type="date"
+                value={formData.dateOfBirth}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="phoneNumber" className="text-sm font-medium">
+                Phone Number
+              </label>
+              <Input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                placeholder="+84 912 345 678"
+                value={formData.phoneNumber}
                 onChange={handleChange}
                 disabled={isLoading}
               />
@@ -157,14 +248,37 @@ export default function RegisterPage() {
             </Button>
           </form>
 
+          {/* Success confirmation dialog */}
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Tạo thành công</DialogTitle>
+                <DialogDescription>{successMessage}</DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  onClick={() => {
+                    setDialogOpen(false);
+                    router.push("/auth/login");
+                  }}
+                >
+                  Xác nhận
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <div className="mt-6 text-center text-sm">
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-primary hover:underline font-semibold">
+            <Link
+              href="/auth/login"
+              className="text-primary hover:underline font-semibold"
+            >
               Login here
             </Link>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
