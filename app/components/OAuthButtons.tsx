@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 interface OAuthButtonsProps {
@@ -12,6 +13,8 @@ export function OAuthButtons({
   onFacebookLogin,
   isLoading,
 }: OAuthButtonsProps) {
+  const t = useTranslations("auth.login");
+
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -20,7 +23,7 @@ export function OAuthButtons({
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="px-2 bg-background text-muted-foreground">
-            Or continue with
+            {t("continueWith")}
           </span>
         </div>
       </div>

@@ -1,14 +1,16 @@
 "use client";
 
 import { Search, ShoppingCart, User, LogOut } from "lucide-react";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/hooks/data/useAuth";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useAppStore from "@/hooks/useAppStore";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
+  const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
   const { logout } = useAuth();
@@ -27,14 +29,16 @@ export default function Header() {
             <div className="w-8 h-8 bg-red-600 rounded-md flex items-center justify-center">
               <span className="text-white font-bold text-lg">S</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">Shops</span>
+            <span className="text-xl font-bold text-gray-900">
+              {t("header.shops")}
+            </span>
           </Link>
           {/* Search bar */}
           <div className="flex-1 max-w-md mx-8">
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder={t("common.searchProducts")}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 text-sm"
               />
               <Search
@@ -46,6 +50,8 @@ export default function Header() {
 
           {/* Right icons */}
           <div className="flex items-center gap-4">
+            {/* Language Switcher */}
+            <LanguageSwitcher />
             {/* Cart */}
             {/* <Link href="/cart" className="relative text-gray-600 hover:text-red-600 transition-colors">
               <ShoppingCart size={24} />
@@ -97,13 +103,13 @@ export default function Header() {
                 : "text-gray-700 hover:text-gray-900 border-transparent hover:border-gray-300"
             }`}
           >
-            Home
+            {t("header.home")}
           </Link>
           <a
             href="#"
             className="py-4 px-1 text-gray-700 hover:text-gray-900 font-medium border-b-2 border-transparent hover:border-gray-300 transition-all"
           >
-            Categories
+            {t("products.categories")}
           </a>
           <a
             href="#"
@@ -115,7 +121,7 @@ export default function Header() {
             href="#"
             className="py-4 px-1 text-gray-700 hover:text-gray-900 font-medium border-b-2 border-transparent hover:border-gray-300 transition-all"
           >
-            Contact
+            {t("footer.contact")}
           </a>
           {isAuthenticated && (
             <Link
@@ -126,7 +132,7 @@ export default function Header() {
                   : "text-gray-700 hover:text-gray-900 border-transparent hover:border-gray-300"
               }`}
             >
-              Dashboard
+              {t("header.dashboard")}
             </Link>
           )}
         </div>

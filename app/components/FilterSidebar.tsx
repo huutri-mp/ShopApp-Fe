@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 export interface Filters {
   priceRange: [number, number];
   rating: number | null;
@@ -15,8 +17,10 @@ export default function FilterSidebar({
   filters,
   setFilters,
 }: FilterSidebarProps) {
+  const t = useTranslations();
+
   const categories = [
-    { value: "all", label: "All" },
+    { value: "all", label: t("filters.allCategories") },
     { value: "electronics", label: "Electronics" },
     { value: "accessories", label: "Accessories" },
     { value: "audio", label: "Audio" },
@@ -57,7 +61,9 @@ export default function FilterSidebar({
     <div className="space-y-8">
       {/* Price Range Filter */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 mb-5">Price Range</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-5">
+          {t("filters.priceRange")}
+        </h3>
         <div className="space-y-4">
           {/* <div>
             <div className="flex justify-between items-center mb-2">
@@ -88,7 +94,9 @@ export default function FilterSidebar({
 
       {/* Rating Filter */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 mb-5">Rating</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-5">
+          {t("filters.rating")}
+        </h3>
         <div className="space-y-3">
           <label className="flex items-center cursor-pointer">
             {/* <input
@@ -117,7 +125,9 @@ export default function FilterSidebar({
 
       {/* Category Filter */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 mb-5">Category</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-5">
+          {t("filters.category")}
+        </h3>
         <div className="space-y-3">
           {categories.map((cat) => (
             <label key={cat.value} className="flex items-center cursor-pointer">
@@ -142,7 +152,7 @@ export default function FilterSidebar({
         }
         className="w-full text-red-600 font-semibold text-sm hover:text-red-700 transition-colors"
       >
-        Reset filters
+        {t("filters.clearFilters")}
       </button>
     </div>
   );

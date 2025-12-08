@@ -1,6 +1,11 @@
+"use client";
+
 import { Facebook, Twitter, Instagram } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
+  const t = useTranslations();
+
   return (
     <footer className="bg-white border-t border-gray-200 mt-24">
       <div className="container mx-auto px-4 py-16">
@@ -11,7 +16,9 @@ export default function Footer() {
               <div className="w-8 h-8 bg-red-600 rounded-md flex items-center justify-center">
                 <span className="text-white font-bold text-lg">S</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Shops</span>
+              <span className="text-xl font-bold text-gray-900">
+                {t("header.shops")}
+              </span>
             </div>
             <p className="text-gray-600 text-sm"></p>
           </div>
@@ -25,7 +32,7 @@ export default function Footer() {
                   href="#"
                   className="text-gray-600 hover:text-gray-900 text-sm"
                 >
-                  About Us
+                  {t("footer.aboutUs")}
                 </a>
               </li>
               <li>
@@ -41,7 +48,9 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Contact</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">
+              {t("footer.contact")}
+            </h3>
             <div className="space-y-2 text-sm">
               <p className="text-gray-600">support@example.com</p>
               <p className="text-gray-600">+84 (123).456-7890</p>

@@ -5,6 +5,9 @@ import apiClient from "@/lib/api";
 import useAppStore from "@/hooks/useAppStore";
 import useUser from "./useUser";
 import { Address } from "./useAddress";
+import { Gender } from "@/lib/enums";
+
+export { Gender };
 
 export function partJwt(token?: string | null) {
   if (!token) return { needsPassword: false, role: null, userName: null };
@@ -50,17 +53,11 @@ export interface User {
   fullName?: string;
   email?: string;
   phoneNumber?: string;
-  gender?: Gender | string;
+  gender?: Gender;
   dateOfBirth?: string;
   addresses?: Address[];
   avatar?: string;
   needsPasswordCreation?: boolean;
-}
-
-export enum Gender {
-  Male = "male",
-  Female = "female",
-  Other = "other",
 }
 
 export interface LoginCredentials {
@@ -75,6 +72,7 @@ export interface RegisterCredentials {
   fullName?: string;
   dateOfBirth?: string;
   phoneNumber?: string;
+  gender?: Gender;
 }
 
 export interface ChangePasswordData {
