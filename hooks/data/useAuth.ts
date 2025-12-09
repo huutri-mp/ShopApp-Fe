@@ -9,44 +9,6 @@ import { Gender } from "@/lib/enums";
 
 export { Gender };
 
-export function partJwt(token?: string | null) {
-  if (!token) return { needsPassword: false, role: null, userName: null };
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3)
-      return { needsPassword: false, role: null, userName: null };
-    const payload = parts[1];
-    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const json = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map((c) => {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join("")
-    );
-    const obj = JSON.parse(json);
-
-    const needsPassword = Boolean(
-      obj.needsPassword ||
-        obj.needs_password ||
-        obj.needsPasswordCreation ||
-        obj.needs_password_creation ||
-        obj.needs_password === 1 ||
-        obj.needsPassword === 1
-    );
-
-    const role = obj.role || (Array.isArray(obj.roles) && obj.roles[0]) || null;
-
-    const userName =
-      obj.userName || obj.preferred_username || obj.username || obj.sub || null;
-
-    return { needsPassword, role, userName };
-  } catch (e) {
-    return { needsPassword: false, role: null, userName: null };
-  }
-}
-
 export interface User {
   userId?: number;
   userName?: string;
@@ -86,14 +48,7 @@ export interface CreatePasswordData {
 }
 
 export function useAuth() {
-  const {
-    isLoading,
-    setUser,
-    setAuthenticated,
-    setLoading,
-    clear,
-    setAccessToken,
-  } = useAppStore();
+  const { isLoading, setLoading, clear, setAccessToken } = useAppStore();
 
   // reuse profile logic from useUser
   const { getProfile } = useUser();
@@ -184,7 +139,6 @@ export function useAuth() {
     }
   };
 
-  // Change password (for users with existing password)
   const changePassword = async (passwordData: ChangePasswordData) => {
     setLoading(true);
     const response = await apiClient.post(

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -20,14 +21,35 @@ type Props = {
 };
 
 export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
+  const t = useTranslations();
   const sidebarItems = [
-    { id: "profile", label: "Hồ Sơ", icon: UserIcon, section: "account" },
-    { id: "address", label: "Địa Chỉ", icon: MapPin, section: "account" },
-    { id: "password", label: "Mật Khẩu", icon: Lock, section: "account" },
-    { id: "orders", label: "Đơn Mua", icon: ShoppingBag, section: "orders" },
+    {
+      id: "profile",
+      label: t("profile.personalInfo"),
+      icon: UserIcon,
+      section: "account",
+    },
+    {
+      id: "address",
+      label: t("profile.addresses"),
+      icon: MapPin,
+      section: "account",
+    },
+    {
+      id: "password",
+      label: t("profile.changePassword"),
+      icon: Lock,
+      section: "account",
+    },
+    {
+      id: "orders",
+      label: t("profile.myOrders"),
+      icon: ShoppingBag,
+      section: "orders",
+    },
     {
       id: "notifications",
-      label: "Thông Báo",
+      label: t("profile.notifications"),
       icon: Bell,
       section: "settings",
     },
@@ -37,7 +59,7 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
     <div className="w-64 bg-white border-r border-gray-200 p-6">
       <div className="mb-8">
         <h2 className="text-sm font-semibold text-gray-900 mb-4">
-          Tài Khoản Của Tôi
+          {t("profile.myAccount")}
         </h2>
 
         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-6">
@@ -47,12 +69,12 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
               alt="avatar"
             />
             <AvatarFallback>
-              {(user?.fullName || user?.userName || "?")[0]}
+              {(user?.fullName || user?.fullName || "?")[0]}
             </AvatarFallback>
           </Avatar>
           <div>
             <p className="text-sm font-medium text-gray-900">
-              {user?.userName}
+              {user?.fullName}
             </p>
             <p className="text-xs text-gray-500 truncate">{user?.email}</p>
           </div>
@@ -64,7 +86,7 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
           {section === "account" && (
             <>
               <p className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                Quản Lý Tài Khoản
+                {t("profile.manageAccount")}
               </p>
               <div className="space-y-2">
                 {sidebarItems
@@ -90,7 +112,7 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
           {section === "orders" && (
             <>
               <p className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                Mua Hàng
+                {t("profile.shopping")}
               </p>
               <div className="space-y-2">
                 {sidebarItems
@@ -116,7 +138,7 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
           {section === "settings" && (
             <>
               <p className="text-xs font-semibold text-gray-500 uppercase mb-3">
-                Cài Đặt
+                {t("profile.accountSettings")}
               </p>
               <div className="space-y-2">
                 {sidebarItems
@@ -148,7 +170,7 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
           className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          Đăng Xuất
+          {t("header.logout")}
         </Button>
       </div>
     </div>

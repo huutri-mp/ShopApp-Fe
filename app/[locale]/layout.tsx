@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Providers from "@/components/Providers";
+import { Toaster } from "@/components/ui/toaster";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -20,13 +21,10 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
   const messages = await getMessages();
 
   return (
@@ -39,6 +37,7 @@ export default async function LocaleLayout({
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
+            <Toaster />
           </Providers>
         </NextIntlClientProvider>
       </body>

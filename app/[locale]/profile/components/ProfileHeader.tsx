@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
-import { User } from "@/hooks/data/useAuth";
+import type { User } from "@/hooks/data/useAuth";
 
 type Props = {
   user: User;

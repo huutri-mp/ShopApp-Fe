@@ -7,8 +7,7 @@ export interface Address {
   id: number;
   contactName: string;
   contactPhone: string;
-  addressLine1: string;
-  addressLine2?: string;
+  addressLine: string;
   wards?: string;
   province: string;
   isDefault: boolean;
@@ -19,13 +18,20 @@ export interface Address {
 export interface AddressCreationRequest {
   contactName: string;
   contactPhone: string;
-  addressLine1: string;
+  addressLine: string;
   wards: string;
   province: string;
   isDefault?: boolean;
 }
 
-export interface AddressUpdateRequest extends Partial<Address> {}
+export interface AddressUpdateRequest {
+  contactName?: string;
+  contactPhone?: string;
+  addressLine?: string;
+  wards?: string;
+  province?: string;
+  isDefault?: boolean;
+}
 
 export default function useAddress() {
   const { getProfile } = useUser();

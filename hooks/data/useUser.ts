@@ -15,20 +15,6 @@ export interface ProfileUpdateRequest {
   addresses?: Address[];
 }
 
-export interface AddressCreationRequest {
-  contactName: string;
-  contactPhone: string;
-  addressLine1: string;
-  addressLine2?: string;
-  wards: string;
-  districts: string;
-  city?: string;
-  province: string;
-  postalCode: string;
-  country: string;
-  isDefault?: boolean;
-}
-
 export interface AddressUpdateRequest extends Partial<Address> {}
 
 export default function useUser() {
@@ -120,35 +106,10 @@ export default function useUser() {
     return response.data.data;
   };
 
-  // Addresses
-  const createAddress = async (request: AddressCreationRequest) => {
-    const response = await apiClient.post("/address/create", request);
-    return response.data.data || response.data;
-  };
-
-  const updateAddress = async (
-    addressId: number,
-    request: AddressUpdateRequest
-  ) => {
-    const response = await apiClient.put(
-      `/address/update/${addressId}`,
-      request
-    );
-    return response.data.data || response.data;
-  };
-
-  const deleteAddress = async (addressId: number) => {
-    const response = await apiClient.delete(`/address/delete/${addressId}`);
-    return response.data.data || response.data;
-  };
-
   return {
     getProfile,
     updateProfile,
     getAllUsers,
     deleteUser,
-    createAddress,
-    updateAddress,
-    deleteAddress,
   };
 }
