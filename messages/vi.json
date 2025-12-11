@@ -90,14 +90,18 @@
       "fillRequired": "Vui lòng điền đầy đủ các trường bắt buộc",
       "passwordMismatch": "Mật khẩu không khớp",
       "registerSuccess": "Đăng ký thành công! Vui lòng đăng nhập.",
-      "registerError": "Đã xảy ra lỗi trong quá trình đăng ký"
+      "registerError": "Đã xảy ra lỗi trong quá trình đăng ký",
+      "avatar": "Ảnh đại diện",
+      "avatarHint": "Nhấp để tải lên ảnh đại diện (tối đa 5MB)",
+      "avatarTooLarge": "Ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB",
+      "invalidImageType": "Vui lòng chọn file ảnh hợp lệ"
     },
     "changePassword": {
       "title": "Đổi mật khẩu",
       "description": "Cập nhật mật khẩu tài khoản của bạn",
       "currentPassword": "Mật khẩu hiện tại",
       "newPassword": "Mật khẩu mới",
-      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmNewPassword": "Xác nhận mật khẩu mới",
       "changeButton": "Đổi mật khẩu",
       "fillAllFields": "Vui lòng điền đầy đủ thông tin",
       "passwordMismatch": "Mật khẩu mới không khớp",
@@ -113,7 +117,8 @@
       "fillAllFields": "Vui lòng điền đầy đủ thông tin",
       "passwordMismatch": "Mật khẩu không khớp",
       "success": "Tạo mật khẩu thành công!",
-      "error": "Tạo mật khẩu thất bại"
+      "error": "Tạo mật khẩu thất bại",
+      "skip": "Bỏ qua"
     }
   },
   "products": {
@@ -166,6 +171,7 @@
     "other": "Khác",
     "updateProfile": "Cập nhật hồ sơ",
     "updateSuccess": "Cập nhật hồ sơ thành công",
+    "avatarUpdateSuccess": "Cập nhật ảnh đại diện thành công",
     "changePassword": "Đổi mật khẩu",
     "addAddress": "Thêm địa chỉ",
     "editAddress": "Sửa địa chỉ",
@@ -185,7 +191,6 @@
     "contactName": "Tên liên hệ",
     "contactPhone": "Số điện thoại",
     "enterAddressInfo": "Nhập thông tin địa chỉ",
-    "choosePhoto": "Chọn ảnh",
     "manageProfileSecurity": "Quản lý thông tin hồ sơ để bảo mật tài khoản",
     "myAccount": "Tài Khoản Của Tôi",
     "manageAccount": "Quản Lý Tài Khoản",
@@ -202,6 +207,7 @@
     "currentPassword": "Mật khẩu hiện tại",
     "newPassword": "Mật khẩu mới",
     "confirmPassword": "Xác nhận mật khẩu",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
     "updatePassword": "Cập nhật mật khẩu"
   },
   "dashboard": {

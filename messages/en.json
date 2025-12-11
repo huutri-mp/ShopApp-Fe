@@ -80,7 +80,7 @@
       "userName": "User Name",
       "email": "Email",
       "password": "Password",
-      "confirmPassword": "Confirm Password",
+      "confirmNewPassword": "Confirm New Password",
       "fullName": "Full Name (Optional)",
       "phoneNumber": "Phone Number (Optional)",
       "dateOfBirth": "Date of Birth (Optional)",
@@ -90,7 +90,11 @@
       "fillRequired": "Please fill in all required fields",
       "passwordMismatch": "Passwords do not match",
       "registerSuccess": "Registration successful! Please login.",
-      "registerError": "An error occurred during registration"
+      "registerError": "An error occurred during registration",
+      "avatar": "Avatar",
+      "avatarHint": "Click to upload avatar (max 5MB)",
+      "avatarTooLarge": "Image is too large. Please select an image under 5MB",
+      "invalidImageType": "Please select a valid image file"
     },
     "changePassword": {
       "title": "Change Password",
@@ -113,7 +117,8 @@
       "fillAllFields": "Please fill in all fields",
       "passwordMismatch": "Passwords do not match",
       "success": "Password created successfully!",
-      "error": "Failed to create password"
+      "error": "Failed to create password",
+      "skip": "Skip for now"
     }
   },
   "products": {
@@ -166,6 +171,7 @@
     "other": "Other",
     "updateProfile": "Update Profile",
     "updateSuccess": "Profile updated successfully",
+    "avatarUpdateSuccess": "Avatar updated successfully",
     "changePassword": "Change Password",
     "addAddress": "Add Address",
     "editAddress": "Edit Address",
@@ -185,7 +191,6 @@
     "contactName": "Contact Name",
     "contactPhone": "Contact Phone",
     "enterAddressInfo": "Enter address information",
-    "choosePhoto": "Choose Photo",
     "manageProfileSecurity": "Manage profile information to secure your account",
     "myAccount": "My Account",
     "manageAccount": "Manage Account",
@@ -202,6 +207,7 @@
     "currentPassword": "Current Password",
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
+    "confirmNewPassword": "Confirm New Password",
     "updatePassword": "Update Password"
   },
   "dashboard": {

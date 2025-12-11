@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreatePasswordPage() {
   const t = useTranslations();
@@ -28,6 +29,7 @@ export default function CreatePasswordPage() {
   const router = useRouter();
 
   const { createPassword, isLoading } = useAuth();
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,12 +55,30 @@ export default function CreatePasswordPage() {
       const response = await createPassword(formData);
 
       if (response.status === 200) {
+        toast({
+          title: t("common.success"),
+          description: t("auth.createPassword.success"),
+        });
         router.push("/");
       } else {
-        setError(response?.data?.message || t("auth.createPassword.error"));
+        const errorMessage =
+          response?.data?.message || t("auth.createPassword.error");
+        setError(errorMessage);
+        toast({
+          variant: "destructive",
+          title: t("common.error"),
+          description: errorMessage,
+        });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || t("auth.createPassword.error"));
+      const errorMessage =
+        err.response?.data?.message || t("auth.createPassword.error");
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description: errorMessage,
+      });
     }
   };
 
@@ -123,6 +143,16 @@ export default function CreatePasswordPage() {
               {isLoading
                 ? t("common.loading")
                 : t("auth.createPassword.createButton")}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              disabled={isLoading}
+              onClick={() => router.push("/")}
+            >
+              {t("auth.createPassword.skip")}
             </Button>
           </form>
         </CardContent>

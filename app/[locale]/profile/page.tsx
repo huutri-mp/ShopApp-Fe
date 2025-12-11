@@ -6,11 +6,8 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 import useAppStore from "@/hooks/useAppStore";
 import useUser from "@/hooks/data/useUser";
-import useAddress, {
-  Address,
-  AddressUpdateRequest,
-} from "@/hooks/data/useAddress";
-import type { User } from "@/hooks/data/useAuth";
+import useAddress, { Address } from "@/hooks/data/useAddress";
+import { useAuth } from "@/hooks/data/useAuth";
 import { Gender } from "@/hooks/data/useAuth";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -55,18 +52,18 @@ export default function ProfilePage() {
     dateOfBirth: "",
   });
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
+    oldPassword: "",
     newPassword: "",
-    confirmPassword: "",
+    confirmNewPassword: "",
   });
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const { updateProfile } = useUser();
+  const { changePassword } = useAuth();
   const { createAddress, updateAddress, deleteAddress } = useAddress();
 
-  // Sync user data to form state when component loads
   useEffect(() => {
     if (user) {
       setFormData({
@@ -178,24 +175,34 @@ export default function ProfilePage() {
   };
   const uploadAvatarImmediate = async (f: File) => {
     try {
-      await updateProfile({}, f);
+      const updated = await updateProfile({}, f);
+      if (updated) {
+        setUser(updated);
+        toast({
+          title: t("common.success"),
+          description: t("profile.avatarUpdateSuccess"),
+        });
+      }
       if (avatarPreview) {
         URL.revokeObjectURL(avatarPreview);
         setAvatarPreview(null);
       }
-    } catch (err) {
+    } catch (err: any) {
       setAvatarPreview(null);
-      throw err;
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description:
+          err.response?.data?.message ||
+          err.message ||
+          t("errors.somethingWentWrong"),
+      });
     }
   };
 
   const handleSaveProfile = async () => {
     setProfileLoading(true);
-    console.log("=== SAVE PROFILE START ===");
-    console.log("Form Data:", formData);
-
     try {
-      // Email validation
       if (
         formData.email &&
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
@@ -210,7 +217,6 @@ export default function ProfilePage() {
         return;
       }
 
-      // Phone validation
       if (
         formData.phoneNumber &&
         !/^\+?[0-9]{10,15}$/.test(formData.phoneNumber)
@@ -302,7 +308,7 @@ export default function ProfilePage() {
   };
 
   const handleChangePassword = async () => {
-    if (!passwordData.currentPassword) {
+    if (!passwordData.oldPassword) {
       toast({
         variant: "destructive",
         title: t("common.error"),
@@ -326,7 +332,7 @@ export default function ProfilePage() {
       });
       return;
     }
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
+    if (passwordData.newPassword !== passwordData.confirmNewPassword) {
       toast({
         variant: "destructive",
         title: t("common.error"),
@@ -336,17 +342,39 @@ export default function ProfilePage() {
     }
     setPasswordLoading(true);
     try {
+      const response = await changePassword({
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+        confirmNewPassword: passwordData.confirmNewPassword,
+      });
+
+      if (response.status === 200) {
+        toast({
+          title: t("common.success"),
+          description: t("auth.changePassword.success"),
+        });
+        setPasswordData({
+          oldPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: t("common.error"),
+          description:
+            response?.data?.message || t("auth.changePassword.error"),
+        });
+      }
+    } catch (err: any) {
       toast({
-        title: t("common.success"),
-        description: t("auth.changePassword.success"),
+        variant: "destructive",
+        title: t("common.error"),
+        description:
+          err.response?.data?.message ||
+          err.message ||
+          t("auth.changePassword.error"),
       });
-      setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch (err) {
-      throw err;
     } finally {
       setPasswordLoading(false);
     }
@@ -369,7 +397,12 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar user={user!} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar
+        user={user!}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        avatarPreview={avatarPreview}
+      />
       <div className="flex-1">
         <ProfileHeader
           user={user!}
@@ -617,9 +650,9 @@ export default function ProfilePage() {
                     {t("profile.currentPassword")}
                   </label>
                   <Input
-                    name="currentPassword"
+                    name="oldPassword"
                     type="password"
-                    value={passwordData.currentPassword}
+                    value={passwordData.oldPassword}
                     onChange={handlePasswordChange}
                     className="mt-1"
                   />
@@ -638,12 +671,12 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    {t("profile.confirmPassword")}
+                    {t("profile.confirmNewPassword")}
                   </label>
                   <Input
-                    name="confirmPassword"
+                    name="confirmNewPassword"
                     type="password"
-                    value={passwordData.confirmPassword}
+                    value={passwordData.confirmNewPassword}
                     onChange={handlePasswordChange}
                     className="mt-1"
                   />

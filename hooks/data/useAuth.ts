@@ -38,8 +38,9 @@ export interface RegisterCredentials {
 }
 
 export interface ChangePasswordData {
-  currentPassword: string;
+  oldPassword: string;
   newPassword: string;
+  confirmNewPassword: string;
 }
 
 export interface CreatePasswordData {
@@ -72,11 +73,31 @@ export function useAuth() {
   };
 
   // Register new user
-  const register = async (credentials: RegisterCredentials) => {
+  const register = async (
+    credentials: RegisterCredentials,
+    avatarFile?: File | null
+  ) => {
     setLoading(true);
-    const response = await apiClient.post("/auth/register", credentials);
-    setLoading(false);
-    return response;
+    try {
+      const form = new FormData();
+      form.append(
+        "userData",
+        new Blob([JSON.stringify(credentials)], { type: "application/json" })
+      );
+      if (avatarFile) {
+        form.append("avt", avatarFile);
+      }
+      const response = await apiClient.post("/auth/register", form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = async (): Promise<void> => {
@@ -141,21 +162,31 @@ export function useAuth() {
 
   const changePassword = async (passwordData: ChangePasswordData) => {
     setLoading(true);
-    const response = await apiClient.post(
-      "/auth/change-password",
-      passwordData
-    );
-    setLoading(false);
-    return response;
+    try {
+      const response = await apiClient.put("/auth/change-password", {
+        ...passwordData,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createPassword = async (passwordData: CreatePasswordData) => {
     setLoading(true);
-    const response = await apiClient.post("/auth/create-password", {
-      password: passwordData.password,
-    });
-    setLoading(false);
-    return response;
+    try {
+      console.log("Creating password with data:", passwordData);
+      const response = await apiClient.post("/auth/create-password", {
+        ...passwordData,
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {

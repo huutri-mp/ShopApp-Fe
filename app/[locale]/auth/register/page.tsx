@@ -15,8 +15,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Camera, User } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const { register, isLoading } = useAuth();
 
@@ -50,6 +53,26 @@ export default function RegisterPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (error) setError("");
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(t("auth.register.avatarTooLarge"));
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        setError(t("auth.register.invalidImageType"));
+        return;
+      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -82,15 +105,18 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await register({
-        email: formData.email,
-        userName: formData.userName,
-        password: formData.password,
-        fullName: formData.fullName,
-        dateOfBirth: formData.dateOfBirth,
-        phoneNumber: formData.phoneNumber,
-        gender: formData.gender as Gender,
-      });
+      const response = await register(
+        {
+          email: formData.email,
+          userName: formData.userName,
+          password: formData.password,
+          fullName: formData.fullName,
+          dateOfBirth: formData.dateOfBirth,
+          phoneNumber: formData.phoneNumber,
+          gender: formData.gender as Gender,
+        },
+        avatarFile
+      );
 
       if (response?.status === 200) {
         const data = response.data;
@@ -123,6 +149,41 @@ export default function RegisterPage() {
                 {error}
               </div>
             )}
+
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center space-y-2">
+              <label className="text-sm font-medium">
+                {t("auth.register.avatar")}
+              </label>
+              <div className="relative group">
+                <Avatar className="h-24 w-24 border-2 border-muted">
+                  {avatarPreview ? (
+                    <AvatarImage src={avatarPreview} alt="Avatar preview" />
+                  ) : (
+                    <AvatarFallback className="bg-muted">
+                      <User className="h-10 w-10 text-muted-foreground" />
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                >
+                  <Camera className="h-6 w-6 text-white" />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                  disabled={isLoading}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t("auth.register.avatarHint")}
+              </p>
+            </div>
 
             <div className="space-y-2">
               <label htmlFor="userName" className="text-sm font-medium">

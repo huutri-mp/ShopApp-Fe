@@ -88,25 +88,33 @@ function AddressDialog({
       reset(merged);
     }
   }, [open, initial?.id, initial?.province, initial?.wards, reset]);
-
   const onSubmit = async (data: Partial<Address>) => {
-    // Only send fields that changed (using dirtyFields from React Hook Form)
-    const changedFields: Partial<Address> = {};
-    
-    if (dirtyFields.contactName) changedFields.contactName = data.contactName;
-    if (dirtyFields.contactPhone) changedFields.contactPhone = data.contactPhone;
-    if (dirtyFields.addressLine) changedFields.addressLine = data.addressLine;
-    if (dirtyFields.province) changedFields.province = data.province;
-    if (dirtyFields.wards) changedFields.wards = data.wards;
-    if (dirtyFields.isDefault) changedFields.isDefault = data.isDefault;
+    let changedFields: Partial<Address> = {
+      ...(dirtyFields.contactName && { contactName: data.contactName }),
+      ...(dirtyFields.contactPhone && { contactPhone: data.contactPhone }),
+      ...(dirtyFields.addressLine && { addressLine: data.addressLine }),
+      ...((dirtyFields.province || data.province !== initial?.province) && {
+        province: data.province,
+      }),
+      ...((dirtyFields.wards || data.wards !== initial?.wards) && {
+        wards: data.wards,
+      }),
+      ...((dirtyFields.isDefault || data.isDefault !== initial?.isDefault) && {
+        isDefault: data.isDefault,
+      }),
+      ...(initial?.id && { id: initial.id }),
+    };
 
-    // If editing existing address, include id for reference
-    if (initial?.id) {
-      changedFields.id = initial.id;
+    if (!initial?.id) {
+      changedFields = {
+        contactName: data.contactName,
+        contactPhone: data.contactPhone,
+        addressLine: data.addressLine,
+        province: data.province,
+        wards: data.wards,
+        isDefault: data.isDefault,
+      };
     }
-
-    console.log("Dirty fields:", dirtyFields);
-    console.log("Changed fields to send:", changedFields);
 
     await onSave(changedFields);
     onOpenChange(false);
@@ -176,10 +184,6 @@ function AddressDialog({
             <Input
               {...register("addressLine", {
                 required: t("validation.required"),
-                minLength: {
-                  value: 5,
-                  message: t("validation.minLength", { min: 5 }),
-                },
               })}
               className={`mt-1 ${errors.addressLine ? "border-red-500" : ""}`}
             />
@@ -197,7 +201,9 @@ function AddressDialog({
 
               <Select
                 value={provinceName || ""}
-                onValueChange={(v) => setValue("province", v)}
+                onValueChange={(v) =>
+                  setValue("province", v, { shouldDirty: true })
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder={t("profile.selectProvince")} />
@@ -219,7 +225,9 @@ function AddressDialog({
               <Select
                 disabled={!provinceName || isLoadingWards}
                 value={wardName || ""}
-                onValueChange={(v) => setValue("wards", v)}
+                onValueChange={(v) =>
+                  setValue("wards", v, { shouldDirty: true })
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue
@@ -259,7 +267,9 @@ function AddressDialog({
               type="checkbox"
               id="isDefaultCheckbox"
               checked={watch("isDefault")}
-              onChange={(e) => setValue("isDefault", e.target.checked)}
+              onChange={(e) =>
+                setValue("isDefault", e.target.checked, { shouldDirty: true })
+              }
             />
             <label htmlFor="isDefaultCheckbox" className="text-sm">
               {t("profile.setDefaultAddress")}

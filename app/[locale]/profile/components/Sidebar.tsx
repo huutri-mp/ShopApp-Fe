@@ -4,23 +4,22 @@ import React from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  UserIcon,
-  MapPin,
-  Lock,
-  ShoppingBag,
-  Bell,
-  LogOut,
-} from "lucide-react";
+import { UserIcon, MapPin, Lock, ShoppingBag, Bell } from "lucide-react";
 import type { User } from "@/hooks/data/useAuth";
 
 type Props = {
   user: User;
   activeTab: string;
   setActiveTab: (s: string) => void;
+  avatarPreview?: string | null;
 };
 
-export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
+export default function Sidebar({
+  user,
+  activeTab,
+  setActiveTab,
+  avatarPreview,
+}: Props) {
   const t = useTranslations();
   const sidebarItems = [
     {
@@ -65,7 +64,7 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-6">
           <Avatar className="w-12 h-12">
             <AvatarImage
-              src={user?.avatar || "avatar-placeholder.png"}
+              src={avatarPreview || user?.avatar || "avatar-placeholder.png"}
               alt="avatar"
             />
             <AvatarFallback>
@@ -163,16 +162,6 @@ export default function Sidebar({ user, activeTab, setActiveTab }: Props) {
           )}
         </div>
       ))}
-
-      <div className="mt-8 pt-6 border-t border-gray-200">
-        <Button
-          variant="ghost"
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          {t("header.logout")}
-        </Button>
-      </div>
     </div>
   );
 }

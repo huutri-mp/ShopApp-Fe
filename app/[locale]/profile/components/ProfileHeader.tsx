@@ -51,9 +51,6 @@ export default function ProfileHeader({
             className="hidden"
             onChange={handleFileChange}
           />
-          <p className="text-xs text-gray-500 mt-2 text-center">
-            {t("profile.choosePhoto")}
-          </p>
         </div>
 
         <div className="flex-1">
