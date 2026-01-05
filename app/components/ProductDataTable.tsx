@@ -16,7 +16,7 @@ import {
   useProducts,
   type Product,
 } from "@/hooks/data/useProducts";
-import { Edit, Trash2, ChevronDown, ZoomIn } from "lucide-react";
+import { Edit, Trash2, ZoomIn } from "lucide-react";
 import { useTranslations } from "next-intl";
 import ZoomImage from "@/app/components/ZoomImage";
 
@@ -60,11 +60,10 @@ export default function ProductDataTable({
 
   useEffect(() => {
     onPageChange?.(page, pageSize);
-  }, [page, pageSize]);
+  }, [page, pageSize, onPageChange]);
 
   const [expanded, setExpanded] = useState<string | null>(null);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   return (
     <div className="space-y-4">
       {products.length === 0 ? (

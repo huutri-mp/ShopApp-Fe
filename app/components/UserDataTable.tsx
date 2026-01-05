@@ -39,7 +39,7 @@ export default function UserDataTable({
 
   useEffect(() => {
     onPageChange?.(page, pageSize);
-  }, [page, pageSize]);
+  }, [page, pageSize, onPageChange]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 

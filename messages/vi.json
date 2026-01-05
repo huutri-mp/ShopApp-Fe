@@ -100,7 +100,6 @@
     "selectParent": "Chọn cha"
   },
   "roles": {
-    "common_extra": {},
     "admin": "Quản trị",
     "staff": "Nhân viên",
     "user": "Người dùng"

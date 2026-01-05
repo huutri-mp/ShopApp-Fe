@@ -22,7 +22,7 @@ export default function ZoomImage({
 
     lightbox.init();
     return () => lightbox.destroy();
-  }, [galleryId]);
+  }, [galleryId, images]);
 
   return (
     <div id={galleryId}>

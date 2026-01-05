@@ -17,7 +17,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
@@ -41,7 +40,7 @@ export default function BrandDataTable({
 
   useEffect(() => {
     onPageChange?.(page, pageSize);
-  }, [page, pageSize]);
+  }, [page, pageSize, onPageChange]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const pageItems = brands;

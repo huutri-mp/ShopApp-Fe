@@ -33,8 +33,8 @@ import {
   type ProductVariant,
   type ProductImage,
 } from "@/hooks/data/useProducts";
-import { useBrands, type Brand } from "@/hooks/data/useBrands";
-import { useCategories, Category } from "@/hooks/data/useCategories";
+import { useBrands } from "@/hooks/data/useBrands";
+import { useCategories } from "@/hooks/data/useCategories";
 
 interface ProductFormProps {
   mode: "create" | "edit";

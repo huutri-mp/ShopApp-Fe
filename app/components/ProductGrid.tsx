@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
 import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
 
 const PRODUCTS = [
   {
