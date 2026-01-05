@@ -59,8 +59,9 @@ export default function ChangePasswordPage() {
 
     try {
       const response = await changePassword({
-        currentPassword: formData.currentPassword,
+        oldPassword: formData.currentPassword,
         newPassword: formData.newPassword,
+        confirmNewPassword: formData.confirmPassword,
       });
 
       if (response.status === 200) {
@@ -130,13 +131,13 @@ export default function ChangePasswordPage() {
                   onChange={handleChange}
                   disabled={isLoading}
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                </Button>
               </div>
             </div>
 

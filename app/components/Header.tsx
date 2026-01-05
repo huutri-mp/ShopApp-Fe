@@ -4,7 +4,6 @@ import { Search, ShoppingCart, User, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/hooks/data/useAuth";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useAppStore from "@/hooks/useAppStore";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -14,7 +13,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { logout } = useAuth();
-  const { isAuthenticated, user } = useAppStore();
+  const { isAuthenticated, isAdmin } = useAppStore();
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -123,7 +122,7 @@ export default function Header() {
           >
             {t("footer.contact")}
           </a>
-          {isAuthenticated && (
+          {isAdmin && (
             <Link
               href="/dashboard"
               className={`py-4 px-1 font-medium border-b-2 transition-all ${

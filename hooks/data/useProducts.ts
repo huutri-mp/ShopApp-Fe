@@ -1,79 +1,162 @@
 "use client";
 
-import { useState, useCallback } from "react";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import apiClient from "@/lib/api";
+import type { Paging } from "./paging";
+import { Category } from "./useCategories";
+import { Brand } from "./useBrands";
 export interface Product {
   id: string;
   name: string;
   price: number;
   description: string;
-  category: string;
+  slug: string;
+  category: Category;
+  brand: Brand;
   stock: number;
   rating: number;
   reviews: number;
-  image: string;
+  images: ProductImage[];
   discount?: number;
+  variants?: ProductVariant[];
 }
 
-export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      price: 89.99,
-      description: "High-quality wireless headphones with noise cancellation",
-      category: "Audio",
-      stock: 50,
-      rating: 4.5,
-      reviews: 234,
-      image: "/wireless-headphones.png",
-      discount: 20,
-    },
-    {
-      id: "2",
-      name: "Smart Watch Pro",
-      price: 189.99,
-      description: "Advanced smartwatch with fitness tracking",
-      category: "Smart Devices",
-      stock: 30,
-      rating: 4.8,
-      reviews: 156,
-      image: "/modern-smartwatch.png",
-      discount: 15,
-    },
-  ]);
+export interface ProductImage {
+  id: number;
+  url: string;
+}
+export interface ProductVariant {
+  id?: number;
+  sku?: string;
+  color?: string;
+  size?: string;
+  price?: number;
+  salePrice?: number | null;
+  stock?: number;
+  storage?: string;
+  ram?: string;
+  cpu?: string;
+  gpu?: string;
+  screenSize?: string;
+  screenResolution?: string;
+  batteryCapacity?: string;
+  connectivity?: string;
+  warrantyMonths?: number;
+  weight?: string;
+  material?: string;
+  releaseYear?: number;
+}
+export interface ProductCreationRequest {
+  name: string;
+  description?: string;
+  active?: boolean;
+  categoryId: number;
+  brandId: number;
+  variants?: ProductVariant[];
+}
+export interface ProductUpdateRequest {
+  name?: string;
+  description?: string;
+  categoryId?: number;
+  brandId?: number;
+  variants?: ProductVariant[];
+  removedImageIds?: number[];
+}
 
-  const addProduct = useCallback((newProduct: Omit<Product, "id">) => {
-    const product: Product = {
-      ...newProduct,
-      id: Date.now().toString(),
-    };
-    setProducts((prev) => [product, ...prev]);
-    return product;
-  }, []);
-
-  const updateProduct = useCallback((id: string, updates: Partial<Product>) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
-    );
-  }, []);
-
-  const deleteProduct = useCallback((id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-  }, []);
-
-  const getProductById = useCallback(
-    (id: string) => {
-      return products.find((p) => p.id === id);
-    },
-    [products]
+function toFormData(
+  data: ProductCreationRequest | ProductUpdateRequest,
+  imageFiles?: File[],
+  partName: string = "product"
+) {
+  const form = new FormData();
+  form.append(
+    partName,
+    new Blob([JSON.stringify(data)], { type: "application/json" })
   );
+  if (imageFiles?.length)
+    imageFiles.forEach((f) => form.append("imageFiles", f));
+  return form;
+}
+
+export function useProducts(
+  page: number = 0,
+  size: number = 10,
+  categoryId?: number,
+  brandId?: number,
+  keyword?: string,
+  isDesc?: boolean
+) {
+  const qc = useQueryClient();
+
+  const productsQuery = useQuery<Paging<Product>>({
+    queryKey: ["products", page, size, categoryId, brandId, keyword, isDesc],
+    queryFn: async (): Promise<Paging<Product>> => {
+      const res = await apiClient.get("/products", {
+        params: { page, size, categoryId, brandId, keyword, isDesc },
+      });
+      const payload = (res.data?.data ?? res.data) as Paging<any>;
+      return payload;
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async ({
+      data,
+      files,
+    }: {
+      data: ProductCreationRequest;
+      files?: File[];
+    }) => {
+      const form = toFormData(data, files);
+      const res = await apiClient.post("/products", form);
+      return res.data?.data ?? res.data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      id,
+      data,
+      files,
+    }: {
+      id: number;
+      data: ProductUpdateRequest;
+      files?: File[];
+    }) => {
+      const form = toFormData(data, files, "productUpdate");
+      const res = await apiClient.put(`/products/${id}`, form);
+      return res.data?.data ?? res.data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/products/${id}`);
+      return id;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+  });
+
+  const products: any[] = productsQuery.data?.items ?? [];
+  const meta = {
+    total: productsQuery.data?.total ?? products.length,
+    page: productsQuery.data?.page ?? page,
+    size: productsQuery.data?.size ?? size,
+    hasNext: productsQuery.data?.hasNext ?? false,
+    hasPrev: productsQuery.data?.hasPrev ?? false,
+  };
+
+  const getProductById = (id: string) => products.find((p) => p.id === id);
 
   return {
     products,
-    addProduct,
-    updateProduct,
-    deleteProduct,
+    meta,
+    productsQuery,
     getProductById,
+    createMutation,
+    updateMutation,
+    deleteMutation,
   };
 }

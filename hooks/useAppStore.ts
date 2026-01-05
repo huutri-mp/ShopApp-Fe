@@ -3,10 +3,12 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { User } from "@/hooks/data/useAuth";
+import { Role } from "@/lib/enums";
 
 interface AppState {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   isLoading: boolean;
   accessToken?: string | null;
   setUser: (user: User | null) => void;
@@ -21,10 +23,20 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
+      isAdmin: false,
       isLoading: false,
       accessToken: null,
 
-      setUser: (user) => set({ user }),
+      setUser: (user) =>
+        set({
+          user,
+          isAdmin: Boolean(
+            user?.role &&
+              (Array.isArray(user.role)
+                ? user.role.some((r) => String(r).toUpperCase() === Role.ADMIN)
+                : String(user.role).toUpperCase() === Role.ADMIN)
+          ),
+        }),
       setAuthenticated: (v) => set({ isAuthenticated: v }),
       setLoading: (v) => set({ isLoading: v }),
       setAccessToken: (t) => set({ accessToken: t }),
@@ -38,6 +50,8 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        isAdmin: state.isAdmin,
+        accessToken: state.accessToken,
       }),
     }
   )

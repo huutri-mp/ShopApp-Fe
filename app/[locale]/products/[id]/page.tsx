@@ -21,6 +21,9 @@ export default function ProductDetail({
   const { id } = use(params);
   const product = products.find((p) => p.id === id);
 
+  const getCategoryKey = (c: any) =>
+    c && typeof c === "object" ? c.id ?? c.name : c;
+
   const handleAddToCart = () => {
     setIsLoading(true);
 
@@ -73,7 +76,11 @@ export default function ProductDetail({
   }
 
   const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
+    .filter(
+      (p) =>
+        getCategoryKey(p.category) === getCategoryKey(product.category) &&
+        p.id !== product.id
+    )
     .slice(0, 4);
 
   return (
@@ -158,19 +165,19 @@ export default function ProductDetail({
             {/* Quantity and Add to Cart */}
             <div className="flex items-center gap-4 mb-8">
               <div className="flex items-center border border-gray-300 rounded-lg">
-                <button
+                <Button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                 >
                   -
-                </button>
+                </Button>
                 <span className="px-6 py-2 font-semibold">{quantity}</span>
-                <button
+                <Button
                   onClick={() => setQuantity(quantity + 1)}
                   className="px-4 py-2 text-gray-600 hover:bg-gray-100"
                 >
                   +
-                </button>
+                </Button>
               </div>
               <Button
                 onClick={handleAddToCart}
@@ -194,7 +201,12 @@ export default function ProductDetail({
               <div className="space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span className="font-medium">{t("products.category")}:</span>
-                  <span>{product.category}</span>
+                  <span>
+                    {product.category && typeof product.category === "object"
+                      ? product.category.name ??
+                        String(product.category.id ?? "-")
+                      : product.category}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span className="font-medium">{t("products.stock")}:</span>

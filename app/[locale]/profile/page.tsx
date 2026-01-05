@@ -146,7 +146,6 @@ export default function ProfilePage() {
       throw err;
     }
   };
-
   const setDefaultOnServer = async (index: number) => {
     const addr = (user?.addresses || [])[index];
     if (!addr || !addr.id) return;
@@ -175,7 +174,7 @@ export default function ProfilePage() {
   };
   const uploadAvatarImmediate = async (f: File) => {
     try {
-      const updated = await updateProfile({}, f);
+      const updated = await updateProfile({}, f, user?.userId);
       if (updated) {
         setUser(updated);
         toast({
@@ -207,7 +206,6 @@ export default function ProfilePage() {
         formData.email &&
         !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
       ) {
-        console.log("Email validation failed:", formData.email);
         toast({
           variant: "destructive",
           title: t("common.error"),
@@ -221,7 +219,6 @@ export default function ProfilePage() {
         formData.phoneNumber &&
         !/^\+?[0-9]{10,15}$/.test(formData.phoneNumber)
       ) {
-        console.log("Phone validation failed:", formData.phoneNumber);
         toast({
           variant: "destructive",
           title: t("common.error"),
@@ -239,7 +236,11 @@ export default function ProfilePage() {
         dateOfBirth: formData.dateOfBirth || undefined,
       };
 
-      const updated = await updateProfile(payload, file ?? undefined);
+      const updated = await updateProfile(
+        payload,
+        file ?? undefined,
+        user?.userId
+      );
 
       if (updated) {
         setUser(updated);

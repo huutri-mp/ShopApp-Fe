@@ -110,8 +110,8 @@ export default function LoginPage() {
                   onChange={handleChange}
                   disabled={isLoading}
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                   title={
@@ -119,7 +119,7 @@ export default function LoginPage() {
                       ? t("auth.login.hidePassword")
                       : t("auth.login.showPassword")
                   }
-                ></button>
+                ></Button>
               </div>
             </div>
 

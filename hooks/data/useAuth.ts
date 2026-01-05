@@ -5,12 +5,12 @@ import apiClient from "@/lib/api";
 import useAppStore from "@/hooks/useAppStore";
 import useUser from "./useUser";
 import { Address } from "./useAddress";
-import { Gender } from "@/lib/enums";
+import { Gender, Role } from "@/lib/enums";
 
 export { Gender };
 
 export interface User {
-  userId?: number;
+  userId: number;
   userName?: string;
   fullName?: string;
   email?: string;
@@ -20,6 +20,8 @@ export interface User {
   addresses?: Address[];
   avatar?: string;
   needsPasswordCreation?: boolean;
+  role?: Role;
+  enabled?: boolean;
 }
 
 export interface LoginCredentials {
@@ -35,6 +37,7 @@ export interface RegisterCredentials {
   dateOfBirth?: string;
   phoneNumber?: string;
   gender?: Gender;
+  role?: Role;
 }
 
 export interface ChangePasswordData {
@@ -46,6 +49,11 @@ export interface ChangePasswordData {
 export interface CreatePasswordData {
   password: string;
   confirmPassword: string;
+}
+
+export interface updateAuthUserData {
+  role?: Role;
+  enabled?: boolean;
 }
 
 export function useAuth() {
@@ -177,11 +185,25 @@ export function useAuth() {
   const createPassword = async (passwordData: CreatePasswordData) => {
     setLoading(true);
     try {
-      console.log("Creating password with data:", passwordData);
       const response = await apiClient.post("/auth/create-password", {
         ...passwordData,
       });
       return response;
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateAuthUser = async (userId: number, data: updateAuthUserData) => {
+    setLoading(true);
+    try {
+      const response = await apiClient.put(
+        `/auth/update-auth-user/${userId}`,
+        data
+      );
+      return response.data?.data ?? response.data;
     } catch (err) {
       throw err;
     } finally {
@@ -200,5 +222,6 @@ export function useAuth() {
     handleOAuthCallback,
     changePassword,
     createPassword,
+    updateAuthUser,
   };
 }

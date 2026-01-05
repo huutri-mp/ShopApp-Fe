@@ -74,9 +74,8 @@ apiClient.interceptors.response.use(
       try {
         const refreshUrl =
           process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/refresh-token";
-        // Read XSRF token from cookie and include it in header for the refresh call
         const xsrfToken = getCookie("XSRF-TOKEN");
-        // send both common header names as a fallback (some servers expect X-CSRF-TOKEN)
+
         const xsrfHeaders = xsrfToken
           ? { "X-XSRF-TOKEN": xsrfToken, "X-CSRF-TOKEN": xsrfToken }
           : undefined;
