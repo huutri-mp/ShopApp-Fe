@@ -2,9 +2,12 @@
 
 import apiClient from "@/lib/api";
 import useAppStore from "@/hooks/useAppStore";
-import type { User } from "./useAuth";
+import type { User, RegisterCredentials } from "./useAuth";
 import { Gender } from "./useAuth";
 import { Address } from "./useAddress";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Paging } from "./paging";
+import { Role } from "@/lib/enums";
 
 export interface ProfileUpdateRequest {
   fullName?: string;
@@ -13,6 +16,8 @@ export interface ProfileUpdateRequest {
   gender?: Gender | string | null;
   dateOfBirth?: string;
   addresses?: Address[];
+  roles?: Role;
+  enabled?: boolean;
 }
 
 export interface AddressUpdateRequest extends Partial<Address> {}
@@ -27,9 +32,8 @@ export default function useUser() {
   }> => {
     try {
       setLoading?.(true);
-      const response = await apiClient.get("/user/profile/myInfo");
+      const response = await apiClient.get("/profile/myInfo");
       const data = response.data.data;
-
       const userProfile: User = {
         userId: data.userId,
         userName: data.userName || data.username || data.preferred_username,
@@ -42,6 +46,7 @@ export default function useUser() {
         avatar: data.avatar,
         needsPasswordCreation:
           data.needsPasswordCreation || data.needs_password_creation,
+        role: data.role,
       };
 
       setUser?.(userProfile);
@@ -63,7 +68,8 @@ export default function useUser() {
 
   const updateProfile = async (
     payload: ProfileUpdateRequest,
-    avatarFile?: File
+    avatarFile?: File,
+    id?: number
   ) => {
     const normalized: any = { ...payload };
     const form = new FormData();
@@ -73,7 +79,9 @@ export default function useUser() {
     );
     if (avatarFile) form.append("avt", avatarFile);
 
-    const response = await apiClient.put("/user/profile/update", form, {
+    const url = `/profile/update/${id}`;
+
+    const response = await apiClient.put(url, form, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -92,24 +100,58 @@ export default function useUser() {
       avatar: updated.avatar,
     };
 
-    setUser?.(updatedUser);
+    // Only update global user when updating the current user's profile
+    const currentUser = useAppStore.getState().user;
+    if (!id || currentUser?.userId === updatedUser.userId) {
+      setUser?.(updatedUser);
+    }
+
     return updatedUser;
-  };
-
-  const getAllUsers = async () => {
-    const response = await apiClient.get("/user/profile/all");
-    return response.data.data;
-  };
-
-  const deleteUser = async (userId: number) => {
-    const response = await apiClient.delete(`/user/profile/delete/${userId}`);
-    return response.data.data;
   };
 
   return {
     getProfile,
     updateProfile,
-    getAllUsers,
-    deleteUser,
   };
+}
+
+export function useUsersQuery(
+  page: number = 0,
+  size: number = 10,
+  keyword?: string,
+  role?: string,
+  sort?: string,
+  enabled?: boolean
+) {
+  return useQuery<Paging<User>>({
+    queryKey: ["users", page, size, keyword, role, sort, enabled],
+    queryFn: async (): Promise<Paging<User>> => {
+      const params = new URLSearchParams();
+      params.append("page", String(page));
+      params.append("size", String(size));
+      if (keyword) params.append("keyword", keyword);
+      if (role) params.append("role", role);
+      if (sort) params.append("sort", sort);
+      if (typeof enabled === "boolean")
+        params.append("enabled", String(enabled));
+      const res = await apiClient.get(`/users?${params.toString()}`);
+      const payload = (res.data?.data ?? res.data) as Paging<User>;
+      return payload;
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
+
+export function useDeleteUserMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: number) => {
+      await apiClient.delete(`/profile/delete/${userId}`);
+      return userId;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
 }

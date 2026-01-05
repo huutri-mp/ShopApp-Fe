@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -57,15 +58,15 @@ export default function Footer() {
             </div>
             {/* Social icons */}
             <div className="flex gap-4 mt-6">
-              <button className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900">
+              <Button className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900">
                 <Facebook size={18} />
-              </button>
-              <button className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900">
+              </Button>
+              <Button className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900">
                 <Twitter size={18} />
-              </button>
-              <button className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900">
+              </Button>
+              <Button className="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900">
                 <Instagram size={18} />
-              </button>
+              </Button>
             </div>
           </div>
         </div>

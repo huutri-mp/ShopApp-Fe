@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 
 export interface Filters {
@@ -145,15 +146,14 @@ export default function FilterSidebar({
         </div>
       </div>
 
-      {/* Reset button */}
-      <button
+      <Button
         onClick={() =>
           setFilters({ priceRange: [0, 500], rating: null, category: null })
         }
         className="w-full text-red-600 font-semibold text-sm hover:text-red-700 transition-colors"
       >
         {t("filters.clearFilters")}
-      </button>
+      </Button>
     </div>
   );
 }

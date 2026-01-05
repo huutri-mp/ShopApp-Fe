@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 interface Product {
   id: string;
@@ -14,6 +15,7 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const t = useTranslations();
   return (
     <Link href={`/products/${product.id}`}>
       <div className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-shadow duration-300 group cursor-pointer">
@@ -30,7 +32,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* Stock status */}
           {product.stock === 0 && (
             <div className="absolute top-4 left-4 bg-gray-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold">
-              Out of Stock
+              {t("products.outOfStock")}
             </div>
           )}
           {/* Discount badge */}
@@ -81,7 +83,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
           {/* Add to cart button */}
           <button className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition-colors duration-200 text-sm">
-            Add to Cart
+            {t("products.addToCart")}
           </button>
         </div>
       </div>

@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
+import { useTranslations } from "next-intl";
 
 const PRODUCTS = [
   {
-    id: 1,
+    id: "1",
     name: "Premium Wireless Headphones",
     price: 89.99,
     originalPrice: 179.99,
@@ -14,9 +15,10 @@ const PRODUCTS = [
     badge: "Sale",
     image: "/wireless-headphones-audio-equipment.jpg",
     category: "Electronics",
+    stock: 45,
   },
   {
-    id: 2,
+    id: "2",
     name: "Smart Watch Pro",
     price: 189.99,
     originalPrice: 299.99,
@@ -25,9 +27,10 @@ const PRODUCTS = [
     badge: "Hot",
     image: "/smartwatch-wearable-device.jpg",
     category: "Smart Devices",
+    stock: 12,
   },
   {
-    id: 3,
+    id: "3",
     name: "Phone Case Premium",
     price: 29.99,
     originalPrice: 79.99,
@@ -36,9 +39,10 @@ const PRODUCTS = [
     badge: "Hot",
     image: "/premium-phone-case-protection.jpg",
     category: "Accessories",
+    stock: 120,
   },
   {
-    id: 4,
+    id: "4",
     name: "Portable Power Bank",
     price: 39.99,
     originalPrice: 64.99,
@@ -47,9 +51,10 @@ const PRODUCTS = [
     badge: null,
     image: "/portable-power-bank-charger.jpg",
     category: "Accessories",
+    stock: 87,
   },
   {
-    id: 5,
+    id: "5",
     name: "Wireless Charging Pad",
     price: 24.99,
     originalPrice: 39.99,
@@ -58,9 +63,10 @@ const PRODUCTS = [
     badge: null,
     image: "/wireless-charging-pad-qi-charger.jpg",
     category: "Accessories",
+    stock: 156,
   },
   {
-    id: 6,
+    id: "6",
     name: "USB-C Fast Charger",
     price: 34.99,
     originalPrice: 49.99,
@@ -69,6 +75,7 @@ const PRODUCTS = [
     badge: null,
     image: "/fast-charging-usb-c-adapter.jpg",
     category: "Electronics",
+    stock: 203,
   },
 ];
 
@@ -79,6 +86,7 @@ interface Filters {
 }
 
 export default function ProductGrid({ searchQuery }: { searchQuery: string }) {
+  const t = useTranslations();
   const [filters, setFilters] = useState<Filters>({
     priceRange: [0, 500],
     rating: null,
@@ -108,9 +116,9 @@ export default function ProductGrid({ searchQuery }: { searchQuery: string }) {
         <div className="md:col-span-3">
           <div className="mb-8 border-b border-border pb-4 flex justify-between items-center">
             <h2 className="text-3xl font-bold text-foreground">
-              All Products
+              {t("products.allProducts")}
               <span className="text-muted-foreground font-normal text-lg ml-2">
-                ({filteredProducts.length} results)
+                ({t("common.itemsLabel", { count: filteredProducts.length })})
               </span>
             </h2>
           </div>
@@ -124,7 +132,7 @@ export default function ProductGrid({ searchQuery }: { searchQuery: string }) {
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">
-                No products found matching your criteria.
+                {t("products.noProducts")}
               </p>
             </div>
           )}

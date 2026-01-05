@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
 import { useAuth, Gender } from "@/hooks/data/useAuth";
@@ -295,13 +295,13 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   disabled={isLoading}
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+                </Button>
               </div>
             </div>
 

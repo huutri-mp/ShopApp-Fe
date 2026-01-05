@@ -37,7 +37,7 @@ export default function useAddress() {
   const { getProfile } = useUser();
 
   const createAddress = async (request: AddressCreationRequest) => {
-    const response = await apiClient.post("user/address/create", request);
+    const response = await apiClient.post("address/create", request);
     try {
       await getProfile();
     } catch (e) {}
@@ -49,7 +49,7 @@ export default function useAddress() {
     request: AddressUpdateRequest
   ) => {
     const response = await apiClient.put(
-      `user/address/update/${addressId}`,
+      `address/update/${addressId}`,
       request
     );
     try {
@@ -59,7 +59,7 @@ export default function useAddress() {
   };
 
   const deleteAddress = async (addressId: number) => {
-    const response = await apiClient.delete(`user/address/delete/${addressId}`);
+    const response = await apiClient.delete(`address/delete/${addressId}`);
     try {
       await getProfile();
     } catch (e) {}
