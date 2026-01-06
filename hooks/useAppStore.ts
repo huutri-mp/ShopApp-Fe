@@ -41,7 +41,12 @@ export const useAppStore = create<AppState>()(
       setLoading: (v) => set({ isLoading: v }),
       setAccessToken: (t) => set({ accessToken: t }),
       clear: () =>
-        set({ user: null, isAuthenticated: false, accessToken: null }),
+        set({
+          user: null,
+          isAuthenticated: false,
+          isAdmin: false,
+          accessToken: null,
+        }),
     }),
     {
       name: "shop-app-storage",

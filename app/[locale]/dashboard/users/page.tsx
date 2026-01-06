@@ -37,7 +37,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 export default function UsersManagementPage() {
   const t = useTranslations();
   const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(10);
   const deleteUserMutation = useDeleteUserMutation();
   const { updateProfile } = useUser();
   const { updateAuthUser, register } = useAuth();
