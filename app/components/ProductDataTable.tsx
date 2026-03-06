@@ -43,7 +43,7 @@ export default function ProductDataTable({
   hasNext,
   hasPrev,
 }: ProductDataTableProps) {
-  const { deleteMutation } = useProducts();
+  const { deleteMutation, updateMutation } = useProducts();
   const tProducts = useTranslations("products");
   const tCommon = useTranslations("common");
   const tDashboard = useTranslations("dashboard");
@@ -87,12 +87,12 @@ export default function ProductDataTable({
           return (
             <div key={product.id} className="border rounded bg-white shadow-sm">
               <div
-                className="flex flex-wrap justify-between items-center px-6 py-4 cursor-pointer"
+                className="flex justify-between items-start gap-4 px-6 py-4 cursor-pointer"
                 onClick={() =>
                   setExpanded(expanded === product.id ? null : product.id)
                 }
               >
-                <div>
+                <div className="min-w-0 flex-1">
                   {product.images.length > 0 && (
                     <ZoomImage
                       galleryId={`gallery-${product.id}`}
@@ -127,7 +127,9 @@ export default function ProductDataTable({
                     </ZoomImage>
                   )}
 
-                  <div className="text-lg font-semibold">{product.name}</div>
+                  <div className="text-lg font-semibold break-words">
+                    {product.name}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {product.category.name}
                   </div>
@@ -136,12 +138,12 @@ export default function ProductDataTable({
                   </div>
 
                   {product.description && (
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <div className="text-xs text-muted-foreground mt-1 line-clamp-2 break-words">
                       {product.description}
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex flex-col items-end gap-1 shrink-0">
                   <div className="text-xs text-muted-foreground">
                     {variants.length} SKUs
                   </div>
@@ -158,6 +160,27 @@ export default function ProductDataTable({
                     >
                       <Edit size={16} />
                       {tCommon("edit")}
+                    </Button>
+                    <Button
+                      variant={product.isFeatured ? "default" : "outline"}
+                      size="sm"
+                      className="gap-1"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await updateMutation.mutateAsync({
+                            id: Number(product.id),
+                            data: {
+                              isFeatured: !product.isFeatured,
+                              variants: product.variants,
+                            },
+                          });
+                        } catch (err) {
+                          console.error(err);
+                        }
+                      }}
+                    >
+                      {tDashboard("isFeatured") || "Feature"}
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -206,11 +229,7 @@ export default function ProductDataTable({
                         {tProducts("inventoryValue")}
                       </div>
                       <div className="text-xl font-bold">
-                        $
-                        {inventoryValue.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        {inventoryValue.toLocaleString("vi-VN")}đ
                       </div>
                     </div>
                     <div>
@@ -218,11 +237,7 @@ export default function ProductDataTable({
                         {tProducts("avgPrice")}
                       </div>
                       <div className="text-xl font-bold">
-                        $
-                        {avgPrice.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        {avgPrice.toLocaleString("vi-VN")}đ
                       </div>
                     </div>
                   </div>
@@ -293,97 +308,93 @@ export default function ProductDataTable({
                         </tr>
                       </thead>
                       <tbody>
-                        {variants.map((v: any, idx: number) => (
-                          <tr key={v.sku || idx}>
-                            <td className="py-2 px-3">{v.sku || "-"}</td>
-                            <td className="py-2 px-3">
-                              {v.color ? (
-                                <span
-                                  className="inline-block w-4 h-4 rounded border"
-                                  style={{ backgroundColor: v.color }}
-                                />
-                              ) : (
-                                "-"
-                              )}
-                            </td>
-                            <td className="py-2 px-3">{v.size || "-"}</td>
-                            <td className="py-2 px-3 text-right">
-                              $
-                              {(v.price ?? 0).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.salePrice != null
-                                ? `$${v.salePrice.toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                  })}`
-                                : "-"}
-                            </td>
-                            <td
-                              className={
-                                "py-2 px-3 text-right " +
-                                ((v.stock ?? 0) === 0
-                                  ? "text-red-600 font-bold"
-                                  : (v.stock ?? 0) < 10
-                                  ? "text-orange-600"
-                                  : "")
-                              }
-                            >
-                              {v.stock ?? 0}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.storage || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.ram || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.cpu || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.gpu || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.screenSize || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.screenResolution || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.batteryCapacity || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.connectivity || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.weight || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.material || "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.releaseYear != null ? v.releaseYear : "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              {v.warrantyMonths != null
-                                ? v.warrantyMonths
-                                : "-"}
-                            </td>
-                            <td className="py-2 px-3 text-right">
-                              $
-                              {((v.price ?? 0) * (v.stock ?? 0)).toLocaleString(
-                                undefined,
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
+                        {variants.map((v: any, idx: number) => {
+                          const attr = v.attributes || {};
+                          return (
+                            <tr key={v.sku || idx}>
+                              <td className="py-2 px-3">{v.skuCode || "-"}</td>
+                              <td className="py-2 px-3">
+                                {attr.color ? (
+                                  <span
+                                    className="inline-block w-4 h-4 rounded border"
+                                    style={{ backgroundColor: attr.color }}
+                                  />
+                                ) : (
+                                  "-"
+                                )}
+                              </td>
+                              <td className="py-2 px-3">{attr.size || "-"}</td>
+                              <td className="py-2 px-3 text-right">
+                                {v.price != null
+                                  ? `${v.price.toLocaleString("vi-VN")}đ`
+                                  : "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {v.salePrice != null
+                                  ? `${v.salePrice.toLocaleString("vi-VN")}đ`
+                                  : "-"}
+                              </td>
+                              <td
+                                className={
+                                  "py-2 px-3 text-right " +
+                                  ((v.stock ?? 0) === 0
+                                    ? "text-red-600 font-bold"
+                                    : (v.stock ?? 0) < 10
+                                    ? "text-orange-600"
+                                    : "")
                                 }
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                              >
+                                {v.stock ?? 0}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.storage || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.ram || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.cpu || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.gpu || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.screenSize || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.screenResolution || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.batteryCapacity || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.connectivity || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.weight || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.material || "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.releaseYear != null
+                                  ? attr.releaseYear
+                                  : "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {attr.warrantyMonths != null
+                                  ? attr.warrantyMonths
+                                  : "-"}
+                              </td>
+                              <td className="py-2 px-3 text-right">
+                                {(
+                                  (v.price ?? 0) * (v.stock ?? 0)
+                                ).toLocaleString("vi-VN")}
+                                đ
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

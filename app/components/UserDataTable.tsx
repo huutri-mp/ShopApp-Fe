@@ -23,6 +23,8 @@ interface UserDataTableProps {
   page?: number;
   pageSize?: number;
   total?: number;
+  hasNext?: boolean;
+  hasPrev?: boolean;
 }
 
 export default function UserDataTable({
@@ -33,6 +35,8 @@ export default function UserDataTable({
   page = 1,
   pageSize = 10,
   total = users.length,
+  hasNext,
+  hasPrev,
 }: UserDataTableProps) {
   const tCommon = useTranslations("common");
   const tDashboard = useTranslations("dashboard");
@@ -95,7 +99,7 @@ export default function UserDataTable({
                 </td>
               </tr>
             ) : (
-              pageItems.map((u, idx) => (
+              pageItems.map((u) => (
                 <tr
                   key={u.userId}
                   className="border-b border-border hover:bg-muted/50"
@@ -191,35 +195,33 @@ export default function UserDataTable({
           {tCommon("itemsLabel", { count: total })}
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            className="px-2 py-1 rounded border"
-            onClick={() => onPageChange?.(Math.max(1, page - 1), pageSize)}
-            disabled={page <= 1}
-          >
-            {tCommon("previous")}
-          </Button>
+          {(hasPrev ?? page > 1) && (
+            <Button
+              variant="outline"
+              onClick={() => onPageChange?.(page - 1, pageSize)}
+            >
+              {tCommon("previous")}
+            </Button>
+          )}
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <Button
               key={p}
-              className={`px-2 py-1 rounded ${
-                p === page ? "bg-muted text-foreground" : "border"
-              }`}
+              variant={p === page ? "default" : "outline"}
               onClick={() => onPageChange?.(p, pageSize)}
             >
               {p}
             </Button>
           ))}
-          <Button
-            className="px-2 py-1 rounded border"
-            onClick={() =>
-              onPageChange?.(Math.min(totalPages, page + 1), pageSize)
-            }
-            disabled={page >= totalPages}
-          >
-            {tCommon("next")}
-          </Button>
+          {(hasNext ?? page < totalPages) && (
+            <Button
+              variant="outline"
+              onClick={() => onPageChange?.(page + 1, pageSize)}
+            >
+              {tCommon("next")}
+            </Button>
+          )}
           <select
-            value={String(pageSize)}
+            value={pageSize}
             onChange={(e) => onPageChange?.(1, Number(e.target.value))}
             className="ml-2 p-1 border rounded"
           >

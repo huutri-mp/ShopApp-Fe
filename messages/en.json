@@ -1,5 +1,7 @@
 {
   "common": {
+    "months": "months",
+    "creating": "Creating...",
     "brandNameASC": "Brand Name (A → Z)",
     "brandNameDESC": "Brand Name (Z → A)",
     "categoryNameASC": "Category Name (A → Z)",
@@ -22,6 +24,9 @@
     "disabled": "Disabled",
     "allStatus": "All Status",
     "enabledStatus": "Enabled",
+    "enabled": "Enabled",
+    "yes": "Yes",
+    "no": "No",
     "allRoles": "All Roles",
     "searchUser": "Search user...",
     "search": "Search",
@@ -128,6 +133,19 @@
     "shopNow": "Shop Now",
     "learnMore": "Learn More"
   },
+  "home": {
+    "title": "Cutting-edge technology for your digital life",
+    "subtitle": "Discover the latest gadgets, devices, and accessories from the world's leading tech brands. Stay ahead with innovation.",
+    "exploreCategories": "Explore Categories",
+    "shopByCategory": "Shop by Category",
+    "featuredTitle": "Featured Products",
+    "featuredSubtitle": "Best sellers and latest releases",
+    "viewAllProducts": "View All Products",
+    "missionTitle": "Our Mission",
+    "missionContent1": "We're dedicated to bringing the latest technology innovations to tech enthusiasts and professionals. Our carefully curated selection features products from trusted brands worldwide.",
+    "missionContent2": "Every product is tested for quality and performance, ensuring you get the best tech for your needs. We believe technology should be accessible, reliable, and transformative.",
+    "learnAboutUs": "Learn About Us"
+  },
   "auth": {
     "login": {
       "title": "Login",
@@ -194,14 +212,22 @@
   "products": {
     "title": "Products",
     "allProducts": "All Products",
+    "subtitle": "Browse our complete collection of technology products",
     "categories": "Categories",
     "filters": "Filters",
     "priceRange": "Price Range",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
     "rating": "Rating",
     "sortBy": "Sort By",
     "noProducts": "No products found",
+    "promoTitle": "Can't find the product you need?",
+    "promoCall": "Call now: +84 (123).456-7890",
+    "promoEmailHelp": "or email: support@example.com for quick support.",
     "name": "Name",
     "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "installment": "Buy with 0% Installment",
     "outOfStock": "Out of Stock",
     "inStock": "In Stock",
     "viewDetails": "View Details",
@@ -213,12 +239,46 @@
     "stock": "Stock",
     "price": "Price",
     "discount": "Discount",
+    "quantity": "Quantity",
+    "allVariants": "All Variants",
+    "technicalSpecs": "Technical Specifications",
+    "productInfo": "Product Information",
+    "noDescription": "No description available",
+    "shippingInfo": "Shipping Information",
+    "freeShipping": "Free Shipping on orders over 500.000₫",
+    "deliveryTime": "Delivery in 2-5 business days",
     "confirmDeleteMessage": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
     "inventoryValue": "Inventory Value",
     "avgPrice": "Avg Price",
     "skuDetails": "SKU Details",
     "value": "Value",
+    "commitment": {
+      "return": "1-to-1 exchange within 30 days for defective products",
+      "warranty": "official warranty",
+      "delivery": "Fast delivery nationwide"
+    },
+    "specs": {
+      "configMemory": "Configuration & Memory",
+      "screen": "Screen",
+      "battery": "Battery & Charging",
+      "connectivity": "Connectivity",
+      "design": "Design & Materials",
+      "other": "Other"
+    },
     "form": {
+      "cpu": "CPU",
+      "gpu": "GPU",
+      "ram": "RAM",
+      "storage": "Storage",
+      "screenSize": "Screen Size",
+      "screenResolution": "Screen Resolution",
+      "batteryCapacity": "Battery Capacity",
+      "connectivity": "Connectivity",
+      "releaseYear": "Release Year",
+      "weight": "Weight",
+      "warrantyMonths": "Warranty (months)",
+      "material": "Material",
+      "isFeatured": "Is Featured",
       "name": "Name",
       "description": "Description",
       "category": "Category",
@@ -260,6 +320,8 @@
     }
   },
   "cart": {
+    "viewCart": "View Cart",
+    "remove": "Remove",
     "title": "Shopping Cart",
     "emptyCart": "Your cart is empty",
     "continueShopping": "Continue Shopping",
@@ -268,7 +330,22 @@
     "checkout": "Checkout",
     "removeItem": "Remove Item",
     "quantity": "Quantity",
-    "updateCart": "Update Cart"
+    "updateCart": "Update Cart",
+    "summary": "Order Summary",
+    "items": "Items",
+    "clear": "Clear",
+    "selectAll": "Select All",
+    "shippingAddress": "Shipping Address",
+    "addAddress": "Add Address",
+    "noAddress": "You have no address",
+    "selectAddress": "Select Address",
+    "paymentMethod": "Payment Method",
+    "cash": "Cash",
+    "vnPay": "VNPay",
+    "removeConfirm": {
+      "title": "Confirm Removal",
+      "message": "Are you sure you want to remove this item from the cart?"
+    }
   },
   "profile": {
     "title": "My Profile",
@@ -327,6 +404,8 @@
     "updatePassword": "Update Password"
   },
   "dashboard": {
+    "isFeature": "Is Featured",
+    "analytics": "Analytics",
     "editBrand": "Edit Brand",
     "deleteBrand": "Delete Brand",
     "title": "Dashboard",
@@ -378,7 +457,9 @@
     "applyFilters": "Apply Filters",
     "clearFilters": "Clear Filters",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "allBrands": "All Brands",
+    "brand": "Brand"
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",

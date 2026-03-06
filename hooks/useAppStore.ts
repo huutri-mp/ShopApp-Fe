@@ -10,7 +10,9 @@ interface AppState {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
+  searchKeyword?: string;
   accessToken?: string | null;
+  setSearchKeyword: (s: string) => void;
   setUser: (user: User | null) => void;
   setAuthenticated: (v: boolean) => void;
   setLoading: (v: boolean) => void;
@@ -30,13 +32,10 @@ export const useAppStore = create<AppState>()(
       setUser: (user) =>
         set({
           user,
-          isAdmin: Boolean(
-            user?.role &&
-              (Array.isArray(user.role)
-                ? user.role.some((r) => String(r).toUpperCase() === Role.ADMIN)
-                : String(user.role).toUpperCase() === Role.ADMIN)
-          ),
+          isAdmin: Boolean(user?.role && user.role === Role.ADMIN),
         }),
+      searchKeyword: "",
+      setSearchKeyword: (s) => set({ searchKeyword: s }),
       setAuthenticated: (v) => set({ isAuthenticated: v }),
       setLoading: (v) => set({ isLoading: v }),
       setAccessToken: (t) => set({ accessToken: t }),

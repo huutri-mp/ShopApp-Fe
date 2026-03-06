@@ -5,13 +5,7 @@ import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/data/useAuth";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { useUsersQuery, useDeleteUserMutation } from "@/hooks/data/useUser";
 import useUser from "@/hooks/data/useUser";
@@ -36,7 +30,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 export default function UsersManagementPage() {
   const t = useTranslations();
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const deleteUserMutation = useDeleteUserMutation();
   const { updateProfile } = useUser();
@@ -46,7 +40,7 @@ export default function UsersManagementPage() {
   const [openEdit, setOpenEdit] = useState(false);
   const [editUser, setEditUser] = useState<any | null>(null);
   const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(
-    null
+    null,
   );
   const [editOriginal, setEditOriginal] = useState<any | null>(null);
   const [form, setForm] = useState({
@@ -63,17 +57,17 @@ export default function UsersManagementPage() {
   const [errors, setErrors] = useState<{ [k: string]: string }>({});
   const [keyword, setKeyword] = useState("");
   const debouncedKeyword = useDebounce(keyword, 400);
-  const [roleFilter, setRoleFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [sort, setSort] = useState("");
-  const [enabledFilter, setEnabledFilter] = useState<string>("");
+  const [enabledFilter, setEnabledFilter] = useState<string>("all");
 
   const usersQuery = useUsersQuery(
-    page,
+    page - 1,
     pageSize,
     debouncedKeyword,
-    roleFilter,
+    roleFilter === "all" ? "" : roleFilter,
     sort,
-    enabledFilter === "" ? undefined : enabledFilter === "true"
+    enabledFilter === "all" ? undefined : enabledFilter === "true",
   );
   const users = usersQuery.data?.items || [];
 
@@ -124,7 +118,7 @@ export default function UsersManagementPage() {
         phoneNumber: form.phoneNumber || undefined,
         role: form.role ? (form.role as Role) : undefined,
       },
-      avatarFile
+      avatarFile,
     );
 
     if (usersQuery?.refetch) await usersQuery.refetch();
@@ -152,7 +146,7 @@ export default function UsersManagementPage() {
         email: "",
         role: "",
         phoneNumber: "",
-      }
+      },
     );
     setEditAvatarPreview(u?.avatar ?? null);
     setEditOriginal(u ? { ...u } : null);
@@ -178,7 +172,7 @@ export default function UsersManagementPage() {
 
       const hasAvatarChange = Object.prototype.hasOwnProperty.call(
         editUser,
-        "avatarFile"
+        "avatarFile",
       );
 
       let updated: any = null;
@@ -190,7 +184,7 @@ export default function UsersManagementPage() {
         updated = await updateProfile(
           profilePayload,
           avatarFileVal,
-          Number(targetId)
+          Number(targetId),
         );
       }
 
@@ -216,7 +210,7 @@ export default function UsersManagementPage() {
         } catch (err: any) {
           console.error(
             "updateAuthUser error",
-            err?.response?.data ?? err?.message ?? err
+            err?.response?.data ?? err?.message ?? err,
           );
           throw err;
         }
@@ -388,7 +382,7 @@ export default function UsersManagementPage() {
                   accept="image/*"
                   onChange={(e) =>
                     setAvatarFile(
-                      e.target.files?.[0] ? e.target.files[0] : null
+                      e.target.files?.[0] ? e.target.files[0] : null,
                     )
                   }
                 />
@@ -422,18 +416,19 @@ export default function UsersManagementPage() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="flex justify-center gap-2 mb-4 border-b pb-4">
+      <div className="flex flex-wrap gap-2 mb-4 border-b pb-4 items-center">
         <Input
           placeholder={t("common.searchUser")}
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          className="flex-1"
+          className="flex-1 min-w-[180px]"
         />
         <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v)}>
-          <SelectTrigger>
+          <SelectTrigger className="min-w-[160px]">
             <SelectValue placeholder={t("common.roleOptionalPlaceholder")} />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value={Role.ADMIN}>{t("roles.admin")}</SelectItem>
             {/* <SelectItem value={Role.STAFF}>{t("roles.staff")}</SelectItem> */}
             <SelectItem value={Role.USER}>{t("roles.user")}</SelectItem>
@@ -443,16 +438,17 @@ export default function UsersManagementPage() {
           value={enabledFilter}
           onValueChange={(v) => setEnabledFilter(v)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="min-w-[160px]">
             <SelectValue placeholder={t("common.enabledStatus")} />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="true">{t("common.enabled")}</SelectItem>
             <SelectItem value="false">{t("common.disabled")}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={sort} onValueChange={(v) => setSort(v)}>
-          <SelectTrigger>
+          <SelectTrigger className="min-w-[160px]">
             <SelectValue placeholder={t("common.sortBy")} />
           </SelectTrigger>
           <SelectContent>
@@ -464,9 +460,10 @@ export default function UsersManagementPage() {
           variant="outline"
           onClick={() => {
             setKeyword("");
-            setRoleFilter("");
-            setEnabledFilter("");
+            setRoleFilter("all");
+            setEnabledFilter("all");
             setSort("");
+            setPage(1);
           }}
         >
           {t("common.resetFilter", { defaultValue: "Reset Filter" })}
@@ -478,8 +475,10 @@ export default function UsersManagementPage() {
           <UserDataTable
             users={users}
             total={usersQuery.data?.total ?? users.length}
-            page={page + 1}
+            page={page}
             pageSize={pageSize}
+            hasNext={usersQuery.data?.hasNext ?? false}
+            hasPrev={usersQuery.data?.hasPrev ?? false}
             onDeleted={async (id: number) =>
               await deleteUserMutation.mutateAsync(id)
             }
@@ -487,7 +486,7 @@ export default function UsersManagementPage() {
               openEditDialog(id);
             }}
             onPageChange={(p: number, s: number) => {
-              setPage(p - 1);
+              setPage(p);
               setPageSize(s);
             }}
           />

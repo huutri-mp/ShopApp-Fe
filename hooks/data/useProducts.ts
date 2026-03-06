@@ -1,10 +1,12 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import apiClient from "@/lib/api";
 import type { Paging } from "./paging";
 import { Category } from "./useCategories";
 import { Brand } from "./useBrands";
+import { SortOrder } from "@/lib/enums";
 export interface Product {
   id: string;
   name: string;
@@ -12,6 +14,7 @@ export interface Product {
   description: string;
   slug: string;
   category: Category;
+  isFeatured?: boolean;
   brand: Brand;
   stock: number;
   rating: number;
@@ -25,14 +28,10 @@ export interface ProductImage {
   id: number;
   url: string;
 }
-export interface ProductVariant {
-  id?: number;
-  sku?: string;
+
+export interface ProductVariantAttributes {
   color?: string;
   size?: string;
-  price?: number;
-  salePrice?: number | null;
-  stock?: number;
   storage?: string;
   ram?: string;
   cpu?: string;
@@ -41,26 +40,49 @@ export interface ProductVariant {
   screenResolution?: string;
   batteryCapacity?: string;
   connectivity?: string;
-  warrantyMonths?: number;
+  warrantyMonths?: string;
   weight?: string;
   material?: string;
-  releaseYear?: number;
+  releaseYear?: string;
+}
+
+export interface ProductVariant {
+  id?: number;
+  skuCode?: string;
+  price?: number;
+  salePrice?: number | null;
+  stock?: number | null;
+  attributes?: ProductVariantAttributes;
 }
 export interface ProductCreationRequest {
   name: string;
+  isFeatured?: boolean;
   description?: string;
-  active?: boolean;
   categoryId: number;
   brandId: number;
   variants?: ProductVariant[];
 }
 export interface ProductUpdateRequest {
   name?: string;
+  isFeatured?: boolean | null;
   description?: string;
   categoryId?: number;
   brandId?: number;
   variants?: ProductVariant[];
   removedImageIds?: number[];
+}
+
+export interface ProductResponse {
+  id: number;
+  name: string;
+  categoryId?: number | null;
+  categoryName?: string | null;
+  brandId?: number | null;
+  brandName?: string | null;
+  image?: string | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  isFeatured?: boolean;
 }
 
 function toFormData(
@@ -94,7 +116,7 @@ export function useProducts(
       const res = await apiClient.get("/products", {
         params: { page, size, categoryId, brandId, keyword, isDesc },
       });
-      const payload = (res.data?.data ?? res.data) as Paging<any>;
+      const payload = (res.data?.data ?? res.data) as Paging<Product>;
       return payload;
     },
   });
@@ -139,6 +161,15 @@ export function useProducts(
     onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
   });
 
+  const fetchProductById = useCallback(
+    async (id: number | string): Promise<Product | null> => {
+      if (!id) return null;
+      const res = await apiClient.get(`/products/${id}`);
+      return (res.data?.data ?? res.data) as Product;
+    },
+    []
+  );
+
   const products: any[] = productsQuery.data?.items ?? [];
   const meta = {
     total: productsQuery.data?.total ?? products.length,
@@ -155,8 +186,60 @@ export function useProducts(
     meta,
     productsQuery,
     getProductById,
+    fetchProductById,
     createMutation,
     updateMutation,
     deleteMutation,
   };
+}
+
+export function useProductSearch({
+  keyword,
+  minPrice,
+  maxPrice,
+  brandIds,
+  sort,
+  isFeatured,
+  categoryIds,
+  page = 0,
+  size = 10,
+}: {
+  keyword?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  brandIds?: number[] | string[];
+  sort?: SortOrder;
+  isFeatured?: boolean;
+  categoryIds?: number[] | string[];
+  page?: number;
+  size?: number;
+}) {
+  return useQuery<Paging<ProductResponse>>({
+    queryKey: [
+      "productSearch",
+      keyword,
+      minPrice,
+      maxPrice,
+      brandIds,
+      sort,
+      isFeatured,
+      categoryIds,
+      page,
+      size,
+    ],
+    queryFn: async (): Promise<Paging<ProductResponse>> => {
+      const params: any = { page, size };
+      if (keyword) params.keyword = keyword;
+      if (minPrice !== undefined) params.minPrice = minPrice;
+      if (maxPrice !== undefined) params.maxPrice = maxPrice;
+      if (brandIds) params.brandIds = brandIds;
+      if (categoryIds) params.categoryIds = categoryIds;
+      if (sort !== undefined) params.isDesc = sort === SortOrder.DESC;
+      if (isFeatured !== undefined) params.isFeatured = isFeatured;
+
+      const res = await apiClient.get("/search", { params });
+      const payload = (res.data?.data ?? res.data) as Paging<ProductResponse>;
+      return payload;
+    },
+  });
 }

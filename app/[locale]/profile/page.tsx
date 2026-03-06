@@ -2,37 +2,23 @@
 
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
 import useAppStore from "@/hooks/useAppStore";
 import useUser from "@/hooks/data/useUser";
 import useAddress, { Address } from "@/hooks/data/useAddress";
+import useOrder from "@/hooks/data/useOrder";
 import { useAuth } from "@/hooks/data/useAuth";
-import { Gender } from "@/hooks/data/useAuth";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
 
 import Sidebar from "./components/Sidebar";
 import ProfileHeader from "./components/ProfileHeader";
-import AddressDialog from "./components/AddressDialog";
+import ProfileInfoTab from "./components/tabs/ProfileInfoTab";
+import AddressTab from "./components/tabs/AddressTab";
+import PasswordTab from "./components/tabs/PasswordTab";
+import OrdersTab from "./components/tabs/OrdersTab";
 
 export default function ProfilePage() {
   const t = useTranslations();
@@ -41,6 +27,7 @@ export default function ProfilePage() {
   const isAuthenticated = useAppStore((s) => s.isAuthenticated);
   const setUser = useAppStore((s) => s.setUser);
   const [activeTab, setActiveTab] = useState("profile");
+  const searchParams = useSearchParams();
   const [file, setFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -59,10 +46,11 @@ export default function ProfilePage() {
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [cancelingOrderId, setCancelingOrderId] = useState<number | null>(null);
   const { updateProfile } = useUser();
   const { changePassword } = useAuth();
   const { createAddress, updateAddress, deleteAddress } = useAddress();
+  const { orders, ordersQuery, cancelOrder, canCancelOrder } = useOrder();
 
   useEffect(() => {
     if (user) {
@@ -76,8 +64,14 @@ export default function ProfilePage() {
     }
   }, [user]);
 
+  // Initialize active tab from query string, e.g., ?tab=orders
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
+
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(
-    null
+    null,
   );
   const [editingAddress, setEditingAddress] = useState<
     Partial<Address> | undefined
@@ -156,8 +150,8 @@ export default function ProfilePage() {
       i === index
         ? { ...a, isDefault: newDefaultValue }
         : newDefaultValue
-        ? { ...a, isDefault: false }
-        : a
+          ? { ...a, isDefault: false }
+          : a,
     );
 
     if (user && updatedAddresses) {
@@ -239,7 +233,7 @@ export default function ProfilePage() {
       const updated = await updateProfile(
         payload,
         file ?? undefined,
-        user?.userId
+        user?.userId,
       );
 
       if (updated) {
@@ -381,6 +375,28 @@ export default function ProfilePage() {
     }
   };
 
+  const handleCancelOrder = async (orderId: number) => {
+    setCancelingOrderId(orderId);
+    try {
+      await cancelOrder.mutateAsync(orderId);
+      toast({
+        title: t("common.success"),
+        description: t("common.success"),
+      });
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description:
+          err.response?.data?.message ||
+          err.message ||
+          t("errors.somethingWentWrong"),
+      });
+    } finally {
+      setCancelingOrderId(null);
+    }
+  };
+
   if (!isAuthenticated || !user) {
     return (
       <div className="p-8">
@@ -413,286 +429,64 @@ export default function ProfilePage() {
         />
 
         <div className="p-8 max-w-full">
-          {/* Profile tab */}
           {activeTab === "profile" && (
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h2 className="text-lg font-semibold mb-6">
-                {t("profile.personalInfo")}
-              </h2>
-              <div className="space-y-4">
-                <div></div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.fullName")}
-                  </label>
-                  <Input
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.email")}
-                  </label>
-                  <Input
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.phoneNumber")}
-                  </label>
-                  <Input
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.gender")}
-                  </label>
-                  <Select
-                    value={formData.gender}
-                    onValueChange={(v) =>
-                      setFormData((prev) => ({ ...prev, gender: v }))
-                    }
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder={t("profile.selectGender")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={Gender.Male}>
-                        {t("common.gender.male")}
-                      </SelectItem>
-                      <SelectItem value={Gender.Female}>
-                        {t("common.gender.female")}
-                      </SelectItem>
-                      <SelectItem value={Gender.Other}>
-                        {t("common.gender.other")}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.dateOfBirth")}
-                  </label>
-                  <Input
-                    name="dateOfBirth"
-                    type="date"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              <Button
-                onClick={handleSaveProfile}
-                disabled={profileLoading}
-                className="mt-6 bg-red-600 hover:bg-red-700 text-white"
-              >
-                {profileLoading ? t("common.saving") : t("common.save")}
-              </Button>
-            </div>
+            <ProfileInfoTab
+              formData={formData}
+              profileLoading={profileLoading}
+              onInputChange={handleInputChange}
+              onGenderChange={(value) =>
+                setFormData((prev) => ({ ...prev, gender: value }))
+              }
+              onSave={handleSaveProfile}
+            />
           )}
 
-          {/* Address tab */}
           {activeTab === "address" && (
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold">
-                  {t("profile.addresses")}
-                </h2>
-                <Button
-                  onClick={() => {
-                    setEditingAddress(undefined);
-                    setAddressDialogOpen(true);
-                  }}
-                  variant="outline"
-                  size="sm"
-                >
-                  {t("profile.addAddress")}
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {(user?.addresses || []).map((addr, idx) => (
-                  <div key={addr.id || idx} className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={addr.isDefault}
-                        onChange={() => setDefaultOnServer(idx)}
-                      />
-                      <label className="text-sm font-medium">
-                        {t("profile.defaultAddress")}
-                      </label>
-                      <div className="ml-auto">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingAddressIndex(idx);
-                            setEditingAddress(addr);
-                            setAddressDialogOpen(true);
-                          }}
-                        >
-                          {t("common.edit")}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => requestDelete(idx)}
-                          className="text-red-600"
-                        >
-                          {t("common.delete")}
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 mt-3">
-                      <div>
-                        <div className="text-sm font-medium">
-                          {t("profile.contactName")}
-                        </div>
-                        <div className="mt-1">{addr.contactName || "-"}</div>
-                      </div>
-
-                      <div>
-                        <div className="text-sm font-medium">
-                          {t("profile.contactPhone")}
-                        </div>
-                        <div className="mt-1">{addr.contactPhone || "-"}</div>
-                      </div>
-
-                      <div>
-                        <div className="text-sm font-medium">
-                          {t("profile.addressLine")}
-                        </div>
-                        <div className="mt-1">{addr.addressLine || "-"}</div>
-                      </div>
-
-                      <div>
-                        <div className="text-sm font-medium">
-                          {t("profile.provinceWard")}
-                        </div>
-                        <div className="mt-1">
-                          {addr.province || "-"}
-                          {addr.wards ? ` - ${addr.wards}` : ""}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <AddressDialog
-                open={addressDialogOpen}
-                onOpenChange={setAddressDialogOpen}
-                initial={editingAddress}
-                onSave={saveAddressFromDialog}
-                title={
-                  editingAddressIndex === null
-                    ? t("profile.addAddress")
-                    : t("profile.updateAddress")
-                }
-              />
-
-              <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {confirmType === "delete"
-                        ? t("common.confirmDelete")
-                        : t("common.confirmSave")}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {confirmType === "delete"
-                        ? t("profile.confirmDeleteAddress")
-                        : t("profile.confirmSaveChanges")}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="ghost">{t("common.cancel")}</Button>
-                    </DialogClose>
-                    <Button
-                      onClick={async () => {
-                        if (confirmType === "delete")
-                          await performDeleteConfirmed();
-                        else if (confirmType === "save-bulk")
-                          await handleSaveAddressesConfirmed();
-                      }}
-                      className="bg-red-600 text-white"
-                    >
-                      {t("common.confirm")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+            <AddressTab
+              addresses={user?.addresses || []}
+              editingAddressIndex={editingAddressIndex}
+              editingAddress={editingAddress}
+              addressDialogOpen={addressDialogOpen}
+              confirmOpen={confirmOpen}
+              confirmType={confirmType}
+              setAddressDialogOpen={setAddressDialogOpen}
+              setConfirmOpen={setConfirmOpen}
+              onOpenAddAddress={() => {
+                setEditingAddressIndex(null);
+                setEditingAddress(undefined);
+                setAddressDialogOpen(true);
+              }}
+              onOpenEditAddress={(idx, addr) => {
+                setEditingAddressIndex(idx);
+                setEditingAddress(addr);
+                setAddressDialogOpen(true);
+              }}
+              onRequestDelete={requestDelete}
+              onToggleDefault={setDefaultOnServer}
+              onSaveAddress={saveAddressFromDialog}
+              onConfirmDelete={performDeleteConfirmed}
+              onConfirmSaveBulk={handleSaveAddressesConfirmed}
+            />
           )}
 
           {activeTab === "password" && (
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h2 className="text-lg font-semibold mb-6">
-                {t("profile.changePassword")}
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.currentPassword")}
-                  </label>
-                  <Input
-                    name="oldPassword"
-                    type="password"
-                    value={passwordData.oldPassword}
-                    onChange={handlePasswordChange}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.newPassword")}
-                  </label>
-                  <Input
-                    name="newPassword"
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("profile.confirmNewPassword")}
-                  </label>
-                  <Input
-                    name="confirmNewPassword"
-                    type="password"
-                    value={passwordData.confirmNewPassword}
-                    onChange={handlePasswordChange}
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              <Button
-                onClick={handleChangePassword}
-                disabled={passwordLoading}
-                className="mt-6 bg-red-600 text-white"
-              >
-                {passwordLoading
-                  ? t("common.updating")
-                  : t("profile.updatePassword")}
-              </Button>
-            </div>
+            <PasswordTab
+              passwordData={passwordData}
+              passwordLoading={passwordLoading}
+              onPasswordChange={handlePasswordChange}
+              onSubmit={handleChangePassword}
+            />
+          )}
+
+          {activeTab === "orders" && (
+            <OrdersTab
+              orders={orders}
+              ordersQuery={ordersQuery}
+              cancelOrder={cancelOrder}
+              cancelingOrderId={cancelingOrderId}
+              canCancelOrder={canCancelOrder}
+              onCancelOrder={handleCancelOrder}
+            />
           )}
         </div>
       </div>

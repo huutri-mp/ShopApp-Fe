@@ -14,9 +14,8 @@ export default function DashboardHeader() {
   const { user } = useAppStore();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
-    router.push("/auth/login");
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (

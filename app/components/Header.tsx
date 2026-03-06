@@ -1,19 +1,26 @@
 "use client";
 
-import { Search, ShoppingCart, User, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User, LogOut, BarChart3 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/hooks/data/useAuth";
 import { Button } from "@/components/ui/button";
 import useAppStore from "@/hooks/useAppStore";
+import { useCart } from "@/hooks/data/useCart";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { ca } from "date-fns/locale";
 
 export default function Header() {
   const t = useTranslations();
   const router = useRouter();
-  const pathname = usePathname();
   const { logout } = useAuth();
-  const { isAuthenticated, isAdmin } = useAppStore();
+  const { isAuthenticated, isAdmin, searchKeyword, setSearchKeyword } =
+    useAppStore();
+  const { totalQuantity: cartCount } = useCart();
+
+  const goToProducts = () => {
+    router.push("/products");
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -38,12 +45,24 @@ export default function Header() {
               <input
                 type="text"
                 placeholder={t("common.searchProducts")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 text-sm"
+                value={searchKeyword || ""}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    goToProducts();
+                  }
+                }}
+                className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:border-red-600 text-sm"
               />
-              <Search
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
+              <button
+                type="button"
+                onClick={goToProducts}
+                aria-label="Search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600"
+              >
+                <Search size={20} />
+              </button>
             </div>
           </div>
 
@@ -52,14 +71,30 @@ export default function Header() {
             {/* Language Switcher */}
             <LanguageSwitcher />
             {/* Cart */}
-            {/* <Link href="/cart" className="relative text-gray-600 hover:text-red-600 transition-colors">
+            <Link
+              href="/cart"
+              className="relative text-gray-600 hover:text-red-600 transition-colors"
+            >
               <ShoppingCart size={24} />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   {cartCount}
                 </span>
               )}
-            </Link> */}
+            </Link>
+
+            {isAdmin && (
+              <Link href="/dashboard">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  {t("header.dashboard")}
+                </Button>
+              </Link>
+            )}
 
             {/* User menu */}
             <div className="flex items-center gap-2">
@@ -90,52 +125,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-
-      {/* Navigation */}
-      <nav className="container mx-auto px-4 py-0">
-        <div className="flex gap-8">
-          <Link
-            href="/"
-            className={`py-4 px-1 font-medium border-b-2 transition-all ${
-              pathname === "/"
-                ? "text-red-600 border-red-600"
-                : "text-gray-700 hover:text-gray-900 border-transparent hover:border-gray-300"
-            }`}
-          >
-            {t("header.home")}
-          </Link>
-          <a
-            href="#"
-            className="py-4 px-1 text-gray-700 hover:text-gray-900 font-medium border-b-2 border-transparent hover:border-gray-300 transition-all"
-          >
-            {t("products.categories")}
-          </a>
-          <a
-            href="#"
-            className="py-4 px-1 text-gray-700 hover:text-gray-900 font-medium border-b-2 border-transparent hover:border-gray-300 transition-all"
-          >
-            Deals
-          </a>
-          <a
-            href="#"
-            className="py-4 px-1 text-gray-700 hover:text-gray-900 font-medium border-b-2 border-transparent hover:border-gray-300 transition-all"
-          >
-            {t("footer.contact")}
-          </a>
-          {isAdmin && (
-            <Link
-              href="/dashboard"
-              className={`py-4 px-1 font-medium border-b-2 transition-all ${
-                pathname.startsWith("/dashboard")
-                  ? "text-red-600 border-red-600"
-                  : "text-gray-700 hover:text-gray-900 border-transparent hover:border-gray-300"
-              }`}
-            >
-              {t("header.dashboard")}
-            </Link>
-          )}
-        </div>
-      </nav>
     </header>
   );
 }

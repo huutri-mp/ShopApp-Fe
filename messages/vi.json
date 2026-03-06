@@ -1,5 +1,7 @@
 {
   "common": {
+    "months": "tháng",
+    "creating": "Đang tạo...",
     "categoryNameASC": "Tên danh mục (A → Z)",
     "categoryNameDESC": "Tên danh mục (Z → A)",
     "brandNameASC": "Tên thương hiệu (A → Z)",
@@ -131,6 +133,19 @@
     "shopNow": "Mua ngay",
     "learnMore": "Tìm hiểu thêm"
   },
+  "home": {
+    "title": "Công nghệ tiên tiến cho cuộc sống số của bạn",
+    "subtitle": "Khám phá các thiết bị, phụ kiện mới nhất từ những thương hiệu công nghệ hàng đầu thế giới. Luôn dẫn đầu với sự đổi mới.",
+    "exploreCategories": "Khám phá danh mục",
+    "shopByCategory": "Mua theo danh mục",
+    "featuredTitle": "Sản phẩm nổi bật",
+    "featuredSubtitle": "Bán chạy và ra mắt mới nhất",
+    "viewAllProducts": "Xem tất cả sản phẩm",
+    "missionTitle": "Sứ mệnh của chúng tôi",
+    "missionContent1": "Chúng tôi cam kết mang đến những đổi mới công nghệ mới nhất cho người yêu công nghệ và các chuyên gia. Bộ sưu tập được tuyển chọn kỹ lưỡng với sản phẩm từ các thương hiệu uy tín trên toàn thế giới.",
+    "missionContent2": "Mỗi sản phẩm đều được kiểm tra chất lượng và hiệu năng, đảm bảo bạn nhận được công nghệ tốt nhất cho nhu cầu của mình. Chúng tôi tin rằng công nghệ nên dễ tiếp cận, đáng tin cậy và mang tính chuyển đổi.",
+    "learnAboutUs": "Tìm hiểu về chúng tôi"
+  },
   "auth": {
     "login": {
       "title": "Đăng nhập",
@@ -197,14 +212,22 @@
   "products": {
     "title": "Sản phẩm",
     "allProducts": "Tất cả sản phẩm",
+    "subtitle": "Khám phá bộ sưu tập sản phẩm công nghệ của chúng tôi",
     "categories": "Danh mục",
     "filters": "Bộ lọc",
     "priceRange": "Khoảng giá",
+    "minPrice": "Giá tối thiểu",
+    "maxPrice": "Giá tối đa",
     "rating": "Đánh giá",
     "sortBy": "Sắp xếp theo",
     "noProducts": "Không tìm thấy sản phẩm",
+    "promoTitle": "Bạn không tìm thấy sản phẩm mình cần?",
+    "promoCall": "Gọi ngay: +84 (123).456-7890",
+    "promoEmailHelp": "hoặc email: support@example.com để được hỗ trợ nhanh chóng.",
     "name": "Tên",
     "addToCart": "Thêm vào giỏ",
+    "buyNow": "Mua ngay",
+    "installment": "Mua trả chậm 0%",
     "outOfStock": "Hết hàng",
     "inStock": "Còn hàng",
     "viewDetails": "Xem chi tiết",
@@ -216,12 +239,46 @@
     "stock": "Tồn kho",
     "price": "Giá",
     "discount": "Giảm giá",
+    "quantity": "Số lượng",
+    "allVariants": "Tất cả phiên bản",
+    "technicalSpecs": "Thông số kỹ thuật",
+    "productInfo": "Thông tin sản phẩm",
+    "noDescription": "Chưa có mô tả",
+    "shippingInfo": "Thông tin vận chuyển",
+    "freeShipping": "Miễn phí giao hàng cho đơn hàng trên 500.000₫",
+    "deliveryTime": "Giao hàng trong 2-5 ngày làm việc",
     "confirmDeleteMessage": "Bạn có chắc muốn xóa \"{name}\"? Hành động này không thể hoàn tác.",
     "inventoryValue": "Giá trị tồn kho",
     "avgPrice": "Giá trung bình",
     "skuDetails": "Chi tiết SKU",
     "value": "Giá trị",
+    "commitment": {
+      "return": "Đổi trả 1-1 trong 30 ngày đối với sản phẩm lỗi",
+      "warranty": "Bảo hành chính hãng",
+      "delivery": "Giao hàng nhanh toàn quốc"
+    },
+    "specs": {
+      "configMemory": "Cấu hình & Bộ nhớ",
+      "screen": "Màn hình",
+      "battery": "Pin & Sạc",
+      "connectivity": "Kết nối",
+      "design": "Thiết kế & Chất liệu",
+      "other": "Khác"
+    },
     "form": {
+      "cpu": "CPU",
+      "gpu": "GPU",
+      "ram": "RAM",
+      "storage": "Bộ nhớ",
+      "screenSize": "Kích thước màn hình",
+      "screenResolution": "Độ phân giải màn hình",
+      "batteryCapacity": "Dung lượng pin",
+      "connectivity": "Kết nối",
+      "releaseYear": "Năm ra mắt",
+      "warrantyMonths": "Bảo hành (tháng)",
+      "weight": "Khối lượng",
+      "material": "Chất liệu",
+      "isFeatured": "Nổi bật",
       "name": "Tên",
       "description": "Mô tả",
       "category": "Danh mục",
@@ -263,6 +320,8 @@
     }
   },
   "cart": {
+    "viewCart": "Xem giỏ hàng",
+    "remove": "Xóa",
     "title": "Giỏ hàng",
     "emptyCart": "Giỏ hàng của bạn đang trống",
     "continueShopping": "Tiếp tục mua sắm",
@@ -271,7 +330,22 @@
     "checkout": "Thanh toán",
     "removeItem": "Xóa sản phẩm",
     "quantity": "Số lượng",
-    "updateCart": "Cập nhật giỏ hàng"
+    "updateCart": "Cập nhật giỏ hàng",
+    "summary": "Tóm tắt đơn hàng",
+    "items": "Sản phẩm",
+    "clear": "Xóa tất cả",
+    "selectAll": "Chọn tất cả",
+    "shippingAddress": "Địa chỉ giao hàng",
+    "addAddress": "Thêm địa chỉ",
+    "noAddress": "Bạn chưa có địa chỉ",
+    "selectAddress": "Chọn địa chỉ",
+    "paymentMethod": "Phương thức thanh toán",
+    "cash": "Tiền mặt",
+    "vnPay": "VNPay",
+    "removeConfirm": {
+      "title": "Xác nhận xóa sản phẩm",
+      "message": "Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?"
+    }
   },
   "profile": {
     "title": "Hồ sơ của tôi",
@@ -330,6 +404,8 @@
     "updatePassword": "Cập nhật mật khẩu"
   },
   "dashboard": {
+    "isFeatured": "Nổi bật",
+    "analytics": "Phân tích",
     "editBrand": "Sửa thương hiệu",
     "deleteBrand": "Xóa thương hiệu",
     "title": "Bảng điều khiển",
@@ -381,7 +457,9 @@
     "applyFilters": "Áp dụng bộ lọc",
     "clearFilters": "Xóa bộ lọc",
     "from": "Từ",
-    "to": "Đến"
+    "to": "Đến",
+    "allBrands": "Tất cả thương hiệu",
+    "brand": "Thương hiệu"
   },
   "errors": {
     "somethingWentWrong": "Đã xảy ra lỗi",

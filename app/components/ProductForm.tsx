@@ -31,6 +31,7 @@ import {
   type ProductCreationRequest,
   type ProductUpdateRequest,
   type ProductVariant,
+  type ProductVariantAttributes,
   type ProductImage,
 } from "@/hooks/data/useProducts";
 import { useBrands } from "@/hooks/data/useBrands";
@@ -62,6 +63,7 @@ const ProductForm = forwardRef(function ProductForm(
     brandId: data?.brandId ?? (data as any)?.brand?.id ?? undefined,
     categoryId: data?.categoryId ?? (data as any)?.category?.id ?? undefined,
     variants: data?.variants || [],
+    isFeatured: (data as any)?.isFeatured ?? false,
   });
 
   const [form, setForm] = useState<ProductUpdateRequest>(() =>
@@ -70,6 +72,12 @@ const ProductForm = forwardRef(function ProductForm(
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
   const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
+  const [displayPrices, setDisplayPrices] = useState<
+    Record<
+      number,
+      { price?: string | undefined; salePrice?: string | undefined }
+    >
+  >({});
 
   const { brands: brandsQuery } = useBrands();
   const { categories: categoriesQuery } = useCategories();
@@ -97,6 +105,20 @@ const ProductForm = forwardRef(function ProductForm(
     setForm((prev) => {
       const next = [...(prev.variants || [])];
       next[idx] = { ...next[idx], ...patch };
+      return { ...prev, variants: next };
+    });
+  };
+
+  const updateVariantAttr = (
+    idx: number,
+    attrPatch: Partial<ProductVariantAttributes>
+  ) => {
+    setForm((prev) => {
+      const next = [...(prev.variants || [])];
+      next[idx] = {
+        ...next[idx],
+        attributes: { ...next[idx].attributes, ...attrPatch },
+      };
       return { ...prev, variants: next };
     });
   };
@@ -138,6 +160,19 @@ const ProductForm = forwardRef(function ProductForm(
     setExistingImages(((initialData as any)?.images as ProductImage[]) || []);
   }, [initialData]);
 
+  useEffect(() => {
+    // sync displayPrices when form variants change
+    const next: Record<number, { price?: string; salePrice?: string }> = {};
+    (form.variants || []).forEach((v, idx) => {
+      next[idx] = {
+        price: v?.price != null ? fmtPrice(v.price) : "",
+        salePrice: v?.salePrice != null ? fmtPrice(v.salePrice) : "",
+      };
+    });
+    setDisplayPrices(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.variants?.length]);
+
   const colorSwatches = [
     "#000000",
     "#FFFFFF",
@@ -158,6 +193,14 @@ const ProductForm = forwardRef(function ProductForm(
     for (let y = current; y >= start; y--) arr.push(y);
     return arr;
   })();
+
+  const fmtPrice = (n?: number | null) =>
+    n == null ? "" : n.toLocaleString("vi-VN");
+
+  const parsePriceInput = (s: string) => {
+    const raw = s.replace(/[^0-9]/g, "");
+    return raw === "" ? null : Number(raw);
+  };
 
   return (
     <form
@@ -216,6 +259,24 @@ const ProductForm = forwardRef(function ProductForm(
                   </SelectContent>
                 </Select>
               </div>
+              {/* <div className="flex items-center gap-2 mt-2">
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(form.isFeatured)}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        isFeatured: e.target.checked,
+                      }))
+                    }
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">
+                    {tProducts("form.isFeatured") || "Nổi bật"}
+                  </span>
+                </label>
+              </div> */}
             </div>
           </div>
 
@@ -387,17 +448,6 @@ const ProductForm = forwardRef(function ProductForm(
                       {/* Main fields */}
                       <div className="space-y-3">
                         <div className="min-w-0 space-y-3">
-                          <Label>SKU</Label>
-                          <Input
-                            className="w-full"
-                            value={v.sku || ""}
-                            onChange={(e) =>
-                              updateVariant(idx, { sku: e.target.value })
-                            }
-                          />
-                        </div>
-
-                        <div className="min-w-0 space-y-3">
                           <Label>{tProducts("form.color")}</Label>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -409,11 +459,13 @@ const ProductForm = forwardRef(function ProductForm(
                                 <span
                                   className="inline-block w-4 h-4 rounded"
                                   style={{
-                                    backgroundColor: v.color || "#808080",
+                                    backgroundColor:
+                                      v.attributes?.color || "#808080",
                                   }}
                                 />
                                 <span className="truncate">
-                                  {v.color || tProducts("form.color")}
+                                  {v.attributes?.color ||
+                                    tProducts("form.color")}
                                 </span>
                               </Button>
                             </PopoverTrigger>
@@ -426,7 +478,7 @@ const ProductForm = forwardRef(function ProductForm(
                                     className="size-8 rounded border"
                                     style={{ backgroundColor: c }}
                                     onClick={() =>
-                                      updateVariant(idx, { color: c })
+                                      updateVariantAttr(idx, { color: c })
                                     }
                                   />
                                 ))}
@@ -439,9 +491,9 @@ const ProductForm = forwardRef(function ProductForm(
                           <Label>{tProducts("form.size")}</Label>
                           <Input
                             className="w-full"
-                            value={v.size || ""}
+                            value={v.attributes?.size || ""}
                             onChange={(e) =>
-                              updateVariant(idx, { size: e.target.value })
+                              updateVariantAttr(idx, { size: e.target.value })
                             }
                           />
                         </div>
@@ -451,15 +503,30 @@ const ProductForm = forwardRef(function ProductForm(
                           <Input
                             className="w-full"
                             type="text"
-                            value={v.price ?? ""}
-                            onChange={(e) =>
-                              updateVariant(idx, {
-                                price:
-                                  e.target.value === ""
-                                    ? undefined
-                                    : Number(e.target.value),
-                              })
+                            value={
+                              displayPrices[idx]?.price ??
+                              fmtPrice(v.price ?? null)
                             }
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setDisplayPrices((prev) => ({
+                                ...prev,
+                                [idx]: { ...(prev[idx] || {}), price: val },
+                              }));
+                            }}
+                            onBlur={(e) => {
+                              const parsed = parsePriceInput(e.target.value);
+                              updateVariant(idx, {
+                                price: parsed == null ? undefined : parsed,
+                              });
+                              setDisplayPrices((prev) => ({
+                                ...prev,
+                                [idx]: {
+                                  ...(prev[idx] || {}),
+                                  price: fmtPrice(parsed),
+                                },
+                              }));
+                            }}
                           />
                         </div>
 
@@ -468,15 +535,30 @@ const ProductForm = forwardRef(function ProductForm(
                           <Input
                             className="w-full"
                             type="text"
-                            value={v.salePrice ?? ""}
-                            onChange={(e) =>
-                              updateVariant(idx, {
-                                salePrice:
-                                  e.target.value === ""
-                                    ? null
-                                    : Number(e.target.value),
-                              })
+                            value={
+                              displayPrices[idx]?.salePrice ??
+                              fmtPrice(v.salePrice ?? null)
                             }
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setDisplayPrices((prev) => ({
+                                ...prev,
+                                [idx]: { ...(prev[idx] || {}), salePrice: val },
+                              }));
+                            }}
+                            onBlur={(e) => {
+                              const parsed = parsePriceInput(e.target.value);
+                              updateVariant(idx, {
+                                salePrice: parsed == null ? null : parsed,
+                              });
+                              setDisplayPrices((prev) => ({
+                                ...prev,
+                                [idx]: {
+                                  ...(prev[idx] || {}),
+                                  salePrice: fmtPrice(parsed),
+                                },
+                              }));
+                            }}
                           />
                         </div>
                       </div>
@@ -499,9 +581,9 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.ram")}</Label>
                             <Input
-                              value={v.ram || ""}
+                              value={v.attributes?.ram || ""}
                               onChange={(e) =>
-                                updateVariant(idx, { ram: e.target.value })
+                                updateVariantAttr(idx, { ram: e.target.value })
                               }
                             />
                           </div>
@@ -509,9 +591,11 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.storage")}</Label>
                             <Input
-                              value={v.storage || ""}
+                              value={v.attributes?.storage || ""}
                               onChange={(e) =>
-                                updateVariant(idx, { storage: e.target.value })
+                                updateVariantAttr(idx, {
+                                  storage: e.target.value,
+                                })
                               }
                             />
                           </div>
@@ -519,9 +603,9 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.cpu")}</Label>
                             <Input
-                              value={v.cpu || ""}
+                              value={v.attributes?.cpu || ""}
                               onChange={(e) =>
-                                updateVariant(idx, { cpu: e.target.value })
+                                updateVariantAttr(idx, { cpu: e.target.value })
                               }
                             />
                           </div>
@@ -529,9 +613,9 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.gpu")}</Label>
                             <Input
-                              value={v.gpu || ""}
+                              value={v.attributes?.gpu || ""}
                               onChange={(e) =>
-                                updateVariant(idx, { gpu: e.target.value })
+                                updateVariantAttr(idx, { gpu: e.target.value })
                               }
                             />
                           </div>
@@ -539,9 +623,9 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.screenSize")}</Label>
                             <Input
-                              value={v.screenSize || ""}
+                              value={v.attributes?.screenSize || ""}
                               onChange={(e) =>
-                                updateVariant(idx, {
+                                updateVariantAttr(idx, {
                                   screenSize: e.target.value,
                                 })
                               }
@@ -553,9 +637,9 @@ const ProductForm = forwardRef(function ProductForm(
                               {tProducts("details.screenResolution")}
                             </Label>
                             <Input
-                              value={v.screenResolution || ""}
+                              value={v.attributes?.screenResolution || ""}
                               onChange={(e) =>
-                                updateVariant(idx, {
+                                updateVariantAttr(idx, {
                                   screenResolution: e.target.value,
                                 })
                               }
@@ -567,9 +651,9 @@ const ProductForm = forwardRef(function ProductForm(
                               {tProducts("details.batteryCapacity")}
                             </Label>
                             <Input
-                              value={v.batteryCapacity || ""}
+                              value={v.attributes?.batteryCapacity || ""}
                               onChange={(e) =>
-                                updateVariant(idx, {
+                                updateVariantAttr(idx, {
                                   batteryCapacity: e.target.value,
                                 })
                               }
@@ -579,9 +663,9 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.connectivity")}</Label>
                             <Input
-                              value={v.connectivity || ""}
+                              value={v.attributes?.connectivity || ""}
                               onChange={(e) =>
-                                updateVariant(idx, {
+                                updateVariantAttr(idx, {
                                   connectivity: e.target.value,
                                 })
                               }
@@ -591,11 +675,10 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.warrantyMonths")}</Label>
                             <Input
-                              type="number"
-                              value={v.warrantyMonths ?? ""}
+                              value={v.attributes?.warrantyMonths ?? ""}
                               onChange={(e) =>
-                                updateVariant(idx, {
-                                  warrantyMonths: Number(e.target.value),
+                                updateVariantAttr(idx, {
+                                  warrantyMonths: e.target.value,
                                 })
                               }
                             />
@@ -604,9 +687,11 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.weight")}</Label>
                             <Input
-                              value={v.weight || ""}
+                              value={v.attributes?.weight || ""}
                               onChange={(e) =>
-                                updateVariant(idx, { weight: e.target.value })
+                                updateVariantAttr(idx, {
+                                  weight: e.target.value,
+                                })
                               }
                             />
                           </div>
@@ -614,9 +699,11 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.material")}</Label>
                             <Input
-                              value={v.material || ""}
+                              value={v.attributes?.material || ""}
                               onChange={(e) =>
-                                updateVariant(idx, { material: e.target.value })
+                                updateVariantAttr(idx, {
+                                  material: e.target.value,
+                                })
                               }
                             />
                           </div>
@@ -624,10 +711,10 @@ const ProductForm = forwardRef(function ProductForm(
                           <div className="space-y-3">
                             <Label>{tProducts("details.releaseYear")}</Label>
                             <Select
-                              value={v.releaseYear ? String(v.releaseYear) : ""}
+                              value={v.attributes?.releaseYear || ""}
                               onValueChange={(val) =>
-                                updateVariant(idx, {
-                                  releaseYear: val ? Number(val) : undefined,
+                                updateVariantAttr(idx, {
+                                  releaseYear: val || undefined,
                                 })
                               }
                             >
@@ -658,6 +745,7 @@ const ProductForm = forwardRef(function ProductForm(
           </div>
         </CardContent>
       </Card>
+      {/* Submit button moved to parent dialog footer */}
     </form>
   );
 });

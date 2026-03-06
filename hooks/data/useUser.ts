@@ -69,13 +69,13 @@ export default function useUser() {
   const updateProfile = async (
     payload: ProfileUpdateRequest,
     avatarFile?: File,
-    id?: number
+    id?: number,
   ) => {
     const normalized: any = { ...payload };
     const form = new FormData();
     form.append(
       "profileUpdate",
-      new Blob([JSON.stringify(normalized)], { type: "application/json" })
+      new Blob([JSON.stringify(normalized)], { type: "application/json" }),
     );
     if (avatarFile) form.append("avt", avatarFile);
 
@@ -98,9 +98,9 @@ export default function useUser() {
       dateOfBirth: updated.dateOfBirth,
       addresses: updated.addresses,
       avatar: updated.avatar,
+      role: updated.role,
     };
 
-    // Only update global user when updating the current user's profile
     const currentUser = useAppStore.getState().user;
     if (!id || currentUser?.userId === updatedUser.userId) {
       setUser?.(updatedUser);
@@ -121,7 +121,7 @@ export function useUsersQuery(
   keyword?: string,
   role?: string,
   sort?: string,
-  enabled?: boolean
+  enabled?: boolean,
 ) {
   return useQuery<Paging<User>>({
     queryKey: ["users", page, size, keyword, role, sort, enabled],

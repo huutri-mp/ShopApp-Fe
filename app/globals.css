@@ -37,6 +37,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Global font variables */
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-serif: Arial, Helvetica, sans-serif;
 }
 
 .dark {
@@ -120,6 +123,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: Arial, Helvetica, sans-serif;
   }
   h1,
   h2,
@@ -128,6 +132,16 @@
   h5,
   h6 {
     @apply text-foreground;
+  }
+}
+
+/* Ensure Tailwind font utilities also use Arial */
+@layer utilities {
+  .font-sans {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .font-serif {
+    font-family: Arial, Helvetica, sans-serif;
   }
 }
 

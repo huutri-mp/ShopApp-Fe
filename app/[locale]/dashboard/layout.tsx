@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "@/i18n/routing";
-import { Users, Package, Tags, Grid2X2 } from "lucide-react";
+import { Users, Package, Tags, Grid2X2, ShoppingCart } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import useAppStore from "@/hooks/useAppStore";
 
@@ -76,6 +76,17 @@ export default function DashboardLayout({
               >
                 <Grid2X2 size={18} />{" "}
                 {t("dashboard.categories", { default: "Categories" })}
+              </Link>
+              <Link
+                href="/dashboard/orders"
+                className={`flex items-center gap-2 p-2 rounded hover:bg-muted ${
+                  pathname?.includes("/dashboard/orders")
+                    ? "bg-muted font-medium"
+                    : ""
+                }`}
+              >
+                <ShoppingCart size={18} />{" "}
+                {t("dashboard.manageOrders", { default: "Manage Orders" })}
               </Link>
             </nav>
           </aside>

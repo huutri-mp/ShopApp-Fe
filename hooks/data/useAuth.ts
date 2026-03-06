@@ -6,6 +6,8 @@ import useAppStore from "@/hooks/useAppStore";
 import useUser from "./useUser";
 import { Address } from "./useAddress";
 import { Gender, Role } from "@/lib/enums";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@/i18n/routing";
 
 export { Gender };
 
@@ -58,6 +60,8 @@ export interface updateAuthUserData {
 
 export function useAuth() {
   const { isLoading, setLoading, clear, setAccessToken } = useAppStore();
+  const qc = useQueryClient();
+  const router = useRouter();
 
   // reuse profile logic from useUser
   const { getProfile } = useUser();
@@ -83,14 +87,14 @@ export function useAuth() {
   // Register new user
   const register = async (
     credentials: RegisterCredentials,
-    avatarFile?: File | null
+    avatarFile?: File | null,
   ) => {
     setLoading(true);
     try {
       const form = new FormData();
       form.append(
         "userData",
-        new Blob([JSON.stringify(credentials)], { type: "application/json" })
+        new Blob([JSON.stringify(credentials)], { type: "application/json" }),
       );
       if (avatarFile) {
         form.append("avt", avatarFile);
@@ -115,10 +119,23 @@ export function useAuth() {
     } catch (error) {
       throw error;
     } finally {
+      // Clear local app store auth state
       clear();
+      // Remove cached cart queries/state so counts/UI reset
+      try {
+        qc.removeQueries({ queryKey: ["cart"] });
+      } catch (_) {
+        // ignore
+      }
       setLoading(false);
       if (typeof window !== "undefined")
         window.dispatchEvent(new Event("auth-changed"));
+      // Navigate to home page after logout
+      try {
+        router.push("/");
+      } catch (_) {
+        if (typeof window !== "undefined") window.location.assign("/");
+      }
     }
   };
 
@@ -129,7 +146,7 @@ export function useAuth() {
     const state = "google";
 
     const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
-      callbackUrl
+      callbackUrl,
     )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile&state=${state}`;
 
     window.location.href = targetUrl;
@@ -142,7 +159,7 @@ export function useAuth() {
     const state = "facebook";
 
     const targetUrl = `${authUrl}?client_id=${facebookClientId}&redirect_uri=${encodeURIComponent(
-      callbackUrl
+      callbackUrl,
     )}&response_type=code&scope=email,public_profile&state=${state}`;
 
     window.location.href = targetUrl;
@@ -150,13 +167,13 @@ export function useAuth() {
 
   const handleOAuthCallback = async (
     code: string,
-    provider: "google" | "facebook"
+    provider: "google" | "facebook",
   ) => {
     try {
       const response = await apiClient.post(
         `/auth/outbound/authentication?code=${code}&provider=${provider}`,
         null,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setAccessToken(response.data.data);
       const profile = await getProfile();
@@ -201,7 +218,7 @@ export function useAuth() {
     try {
       const response = await apiClient.put(
         `/auth/update-auth-user/${userId}`,
-        data
+        data,
       );
       return response.data?.data ?? response.data;
     } catch (err) {

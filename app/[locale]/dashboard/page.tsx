@@ -40,7 +40,7 @@ export default function DashboardPage() {
 
   const totalRevenue = products.reduce(
     (sum, p) => sum + p.price * (p.stock || 0),
-    0
+    0,
   );
   const totalProducts = products.length;
   const totalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
@@ -71,6 +71,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>

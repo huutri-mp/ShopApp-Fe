@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import ProductDataTable from "@/app/components/ProductDataTable";
 import {
   Dialog,
@@ -95,8 +96,18 @@ export default function ProductsManagementPage() {
               <Button variant="ghost" onClick={() => setOpenAddProduct(false)}>
                 {t("common.cancel") || "Cancel"}
               </Button>
-              <Button onClick={() => addFormRef.current?.submit()}>
-                {t("common.create") || "Create"}
+              <Button
+                onClick={() => addFormRef.current?.submit()}
+                disabled={createMutation.isPending}
+              >
+                {createMutation.isPending ? (
+                  <>
+                    <Spinner className="mr-2" />
+                    {t("common.creating") || "Creating..."}
+                  </>
+                ) : (
+                  t("common.create") || "Create"
+                )}
               </Button>
             </div>
           </DialogContent>
@@ -219,8 +230,20 @@ export default function ProductsManagementPage() {
                     >
                       {t("common.cancel") || "Cancel"}
                     </Button>
-                    <Button onClick={() => editFormRef.current?.submit()}>
-                      {t("common.saveChanges") || "Save Changes"}
+                    <Button
+                      onClick={() => editFormRef.current?.submit()}
+                      disabled={updateMutation.isPending}
+                    >
+                      {updateMutation.isPending ? (
+                        <>
+                          <Spinner className="mr-2" />
+                          {t("common.saving") ||
+                            t("common.saveChanges") ||
+                            "Saving..."}
+                        </>
+                      ) : (
+                        t("common.saveChanges") || "Save Changes"
+                      )}
                     </Button>
                   </div>
                 </>
