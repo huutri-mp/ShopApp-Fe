@@ -43,70 +43,68 @@ apiClient.interceptors.response.use(
     const originalRequest = err.config;
     if (!originalRequest) return Promise.reject(err);
 
-    if (err && !originalRequest._retry) {
-      originalRequest._retry = true;
+    originalRequest._retry = true;
 
-      const xsrfTokenPresent = Boolean(getCookie("XSRF-TOKEN"));
-      if (!xsrfTokenPresent) {
-        try {
-          useAppStore.getState().clear();
-        } catch {}
-        if (typeof window !== "undefined")
-          window.dispatchEvent(new Event("auth-changed"));
-        return Promise.reject(err);
-      }
-
-      if (isRefreshing) {
-        return new Promise(function (resolve, reject) {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            if (token && originalRequest.headers)
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            return apiClient(originalRequest);
-          })
-          .catch((e) => Promise.reject(e));
-      }
-
-      isRefreshing = true;
-
+    const xsrfTokenPresent = Boolean(getCookie("XSRF-TOKEN"));
+    if (!xsrfTokenPresent) {
       try {
-        const refreshUrl =
-          process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/refresh-token";
-        const xsrfToken = getCookie("XSRF-TOKEN");
+        useAppStore.getState().clear();
+      } catch {}
+      if (typeof window !== "undefined")
+        window.dispatchEvent(new Event("auth-changed"));
+      return Promise.reject(err);
+    }
 
-        const xsrfHeaders = xsrfToken
-          ? { "X-XSRF-TOKEN": xsrfToken, "X-CSRF-TOKEN": xsrfToken }
-          : undefined;
+    if (isRefreshing) {
+      return new Promise(function (resolve, reject) {
+        failedQueue.push({ resolve, reject });
+      })
+        .then((token) => {
+          if (token && originalRequest.headers)
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiClient(originalRequest);
+        })
+        .catch((e) => Promise.reject(e));
+    }
 
-        const refreshResponse = await axios.post(
-          refreshUrl,
-          {},
-          {
-            withCredentials: true,
-            headers: xsrfHeaders,
-          },
-        );
-        const newToken = refreshResponse.data.data;
+    isRefreshing = true;
 
-        useAppStore.getState().setAccessToken(newToken);
+    try {
+      const refreshUrl =
+        process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/refresh-token";
+      const xsrfToken = getCookie("XSRF-TOKEN");
 
-        processQueue(null, newToken);
+      const xsrfHeaders = xsrfToken
+        ? { "X-XSRF-TOKEN": xsrfToken, "X-CSRF-TOKEN": xsrfToken }
+        : undefined;
 
-        if (newToken && originalRequest.headers)
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return apiClient(originalRequest);
-      } catch (e) {
-        processQueue(e, null);
-        try {
-          useAppStore.getState().clear();
-        } catch (ex) {}
-        if (typeof window !== "undefined")
-          window.dispatchEvent(new Event("auth-changed"));
-        return Promise.reject(e);
-      } finally {
-        isRefreshing = false;
-      }
+      const refreshResponse = await axios.post(
+        refreshUrl,
+        {},
+        {
+          withCredentials: true,
+          headers: xsrfHeaders,
+        },
+      );
+      const newToken = refreshResponse.data.data;
+
+      useAppStore.getState().setAccessToken(newToken);
+
+      processQueue(null, newToken);
+
+      if (newToken && originalRequest.headers)
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      return apiClient(originalRequest);
+    } catch (e) {
+      processQueue(e, null);
+      try {
+        useAppStore.getState().clear();
+      } catch (ex) {}
+      if (typeof window !== "undefined")
+        window.dispatchEvent(new Event("auth-changed"));
+      return Promise.reject(e);
+    } finally {
+      isRefreshing = false;
     }
 
     return Promise.reject(err);
