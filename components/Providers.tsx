@@ -11,17 +11,19 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const { getProfile } = useUser();
   const triedHydrateRef = React.useRef(false);
   const accessToken = useAppStore((s) => s.accessToken);
+  const isAuthenticated = useAppStore((s) => s.isAuthenticated);
 
   useEffect(() => {
     const xsrf = getCookie("XSRF-TOKEN");
-    if (triedHydrateRef.current || !xsrf || accessToken) return;
+    const canHydrate = Boolean(xsrf || accessToken);
+    if (triedHydrateRef.current || !canHydrate || isAuthenticated) return;
     triedHydrateRef.current = true;
     (async () => {
       try {
         await getProfile();
       } catch {}
     })();
-  }, [getProfile, accessToken]);
+  }, [getProfile, accessToken, isAuthenticated]);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

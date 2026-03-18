@@ -62,13 +62,17 @@ export function useCart() {
       const previousCart = qc.getQueryData<Cart>(["cart"]);
 
       if (previousCart) {
-        const existingIndex = previousCart.cartItems.findIndex(
+        const safeCartItems = Array.isArray(previousCart.cartItems)
+          ? previousCart.cartItems
+          : [];
+
+        const existingIndex = safeCartItems.findIndex(
           (item) =>
             item.productId === req.productId &&
             (item.skuCode ?? "") === (req.skuCode ?? ""),
         );
 
-        const nextItems = [...previousCart.cartItems];
+        const nextItems = [...safeCartItems];
         if (existingIndex >= 0) {
           nextItems[existingIndex] = {
             ...nextItems[existingIndex],

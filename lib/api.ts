@@ -75,7 +75,6 @@ const scheduleRefreshFromToken = (
 ) => {
   if (typeof window === "undefined") return;
   const { isAuthenticated } = useAppStore.getState();
-  console.log("Scheduling token refresh, isAuthenticated:", isAuthenticated);
   if (!isAuthenticated) {
     if (refreshIntervalId) {
       clearTimeout(refreshIntervalId);
