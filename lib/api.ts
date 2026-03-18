@@ -20,7 +20,7 @@ apiClient.interceptors.request.use(
     } catch (e) {}
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 let isRefreshing = false;
@@ -41,10 +41,9 @@ apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
-
     if (!originalRequest) return Promise.reject(err);
 
-    if (err.response?.status === 401 && !originalRequest._retry) {
+    if (err && !originalRequest._retry) {
       originalRequest._retry = true;
 
       const xsrfTokenPresent = Boolean(getCookie("XSRF-TOKEN"));
@@ -86,7 +85,7 @@ apiClient.interceptors.response.use(
           {
             withCredentials: true,
             headers: xsrfHeaders,
-          }
+          },
         );
         const newToken = refreshResponse.data.data;
 
@@ -111,7 +110,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(err);
-  }
+  },
 );
 
 export default apiClient;

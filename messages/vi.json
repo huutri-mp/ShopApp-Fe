@@ -207,6 +207,10 @@
       "success": "Tạo mật khẩu thành công!",
       "error": "Tạo mật khẩu thất bại",
       "skip": "Bỏ qua"
+    },
+    "loginRequired": {
+      "title": "Vui lòng đăng nhập",
+      "description": "Bạn cần đăng nhập để sử dụng giỏ hàng hoặc mua hàng."
     }
   },
   "products": {

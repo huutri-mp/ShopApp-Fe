@@ -3,6 +3,7 @@
 import { useState, use, useEffect, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
+import { usePathname } from "@/i18n/routing";
 import {
   Star,
   ShoppingCart,
@@ -32,6 +33,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import LoginRequiredDialog from "@/app/components/LoginRequiredDialog";
+import useAppStore from "@/hooks/useAppStore";
 
 export default function ProductDetail({
   params,
@@ -52,11 +55,20 @@ export default function ProductDetail({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [expandedSpecs, setExpandedSpecs] = useState<string[]>(["config"]);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   const { id } = use(params);
   const router = useRouter();
+  const pathname = usePathname();
   const { fetchProductById } = useProducts();
   const { addToCart } = useCart();
+  const isAuthenticated = useAppStore((s) => s.isAuthenticated);
+
+  const goToLoginWithRedirect = () => {
+    const query = typeof window !== "undefined" ? window.location.search : "";
+    const currentPath = `${pathname}${query}`;
+    router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
+  };
 
   const loadProduct = useCallback(async () => {
     setIsLoading(true);
@@ -152,6 +164,12 @@ export default function ProductDetail({
 
   const handleAddToCart = async () => {
     if (!product || !selectedVariant) return;
+
+    if (!isAuthenticated) {
+      setLoginDialogOpen(true);
+      return;
+    }
+
     setIsAddingToCart(true);
     try {
       await addToCart({
@@ -169,6 +187,12 @@ export default function ProductDetail({
 
   const handleBuyNow = async () => {
     if (!product || !selectedVariant) return;
+
+    if (!isAuthenticated) {
+      setLoginDialogOpen(true);
+      return;
+    }
+
     setIsBuyingNow(true);
     try {
       await addToCart({
@@ -302,6 +326,11 @@ export default function ProductDetail({
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-4">
+      <LoginRequiredDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        onConfirm={goToLoginWithRedirect}
+      />
       <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
         <DialogContent>
           <DialogHeader>

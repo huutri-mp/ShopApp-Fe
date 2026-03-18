@@ -207,6 +207,10 @@
       "success": "Password created successfully!",
       "error": "Failed to create password",
       "skip": "Skip for now"
+    },
+    "loginRequired": {
+      "title": "Please log in",
+      "description": "You need to log in to use the cart or purchase products."
     }
   },
   "products": {

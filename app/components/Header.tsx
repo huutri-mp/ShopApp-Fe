@@ -8,22 +8,42 @@ import { Button } from "@/components/ui/button";
 import useAppStore from "@/hooks/useAppStore";
 import { useCart } from "@/hooks/data/useCart";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { ca } from "date-fns/locale";
+import { useState } from "react";
+import LoginRequiredDialog from "./LoginRequiredDialog";
 
 export default function Header() {
   const t = useTranslations();
   const router = useRouter();
+  const pathname = usePathname();
   const { logout } = useAuth();
   const { isAuthenticated, isAdmin, searchKeyword, setSearchKeyword } =
     useAppStore();
   const { totalQuantity: cartCount } = useCart();
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   const goToProducts = () => {
     router.push("/products");
   };
 
+  const goToLoginWithRedirect = () => {
+    const query = typeof window !== "undefined" ? window.location.search : "";
+    const currentPath = `${pathname}${query}`;
+    router.push(`/auth/login?redirect=${encodeURIComponent(currentPath)}`);
+  };
+
+  const handleCartClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isAuthenticated) return;
+    e.preventDefault();
+    setLoginDialogOpen(true);
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <LoginRequiredDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        onConfirm={goToLoginWithRedirect}
+      />
       {/* Top bar */}
       <div className="border-b border-gray-100">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -73,6 +93,7 @@ export default function Header() {
             {/* Cart */}
             <Link
               href="/cart"
+              onClick={handleCartClick}
               className="relative text-gray-600 hover:text-red-600 transition-colors"
             >
               <ShoppingCart size={24} />

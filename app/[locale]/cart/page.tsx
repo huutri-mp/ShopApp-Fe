@@ -40,7 +40,6 @@ export default function CartPage() {
   const { items, cartQuery, removeItem, clearCart, addToCart } = useCart();
   const { createOrder } = useOrder();
   const { toast } = useToast();
-  console.log("Cart items:", items);
   const keyOf = (i: { productId: number; skuCode?: string }) =>
     `${i.productId}-${i.skuCode ?? ""}`;
   const [selected, setSelected] = useState<Record<string, boolean>>({});

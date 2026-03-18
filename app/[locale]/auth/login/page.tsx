@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/data/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { login, loginWithGoogle, loginWithFacebook, isLoading } = useAuth();
 
@@ -51,7 +53,12 @@ export default function LoginPage() {
         password: formData.password,
       });
       if (response.status === 200) {
-        router.push("/");
+        const redirectPath = searchParams.get("redirect");
+        if (redirectPath && redirectPath.startsWith("/")) {
+          router.push(redirectPath);
+        } else {
+          router.push("/");
+        }
       } else {
         setError(response?.data.message || t("auth.login.loginFailed"));
       }
