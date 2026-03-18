@@ -30,6 +30,14 @@ export default function useUser() {
     user?: User;
     message?: string;
   }> => {
+    const { isAuthenticated, accessToken } = useAppStore.getState();
+    if (!isAuthenticated && !accessToken) {
+      return {
+        success: false,
+        message: "Skipped profile fetch because user is not authenticated",
+      };
+    }
+
     try {
       setLoading?.(true);
       const response = await apiClient.get("/profile/myInfo");

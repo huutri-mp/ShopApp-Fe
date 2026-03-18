@@ -119,18 +119,18 @@ export function useAuth() {
     } catch (error) {
       throw error;
     } finally {
-      // Clear local app store auth state
       clear();
-      // Remove cached cart queries/state so counts/UI reset
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.clear();
+        } catch (_) {}
+      }
       try {
         qc.removeQueries({ queryKey: ["cart"] });
-      } catch (_) {
-        // ignore
-      }
+      } catch (_) {}
       setLoading(false);
       if (typeof window !== "undefined")
         window.dispatchEvent(new Event("auth-changed"));
-      // Navigate to home page after logout
       try {
         router.push("/");
       } catch (_) {
