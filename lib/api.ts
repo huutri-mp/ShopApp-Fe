@@ -94,8 +94,10 @@ const scheduleRefreshFromToken = (
   force: boolean = false,
 ) => {
   if (typeof window === "undefined") return;
-  const { isAuthenticated } = useAppStore.getState();
-  if (!isAuthenticated) {
+  const { accessToken } = useAppStore.getState();
+  const effectiveToken = token ?? accessToken;
+
+  if (!effectiveToken) {
     if (refreshState.refreshIntervalId) {
       clearTimeout(refreshState.refreshIntervalId);
       refreshState.refreshIntervalId = null;
@@ -110,9 +112,7 @@ const scheduleRefreshFromToken = (
     refreshState.refreshIntervalId = null;
   }
 
-  const intervalMs = resolveRefreshIntervalMs(
-    token ?? useAppStore.getState().accessToken,
-  );
+  const intervalMs = resolveRefreshIntervalMs(effectiveToken);
 
   refreshState.refreshIntervalId = setTimeout(() => {
     if (refreshState.isRefreshing) {
@@ -141,7 +141,7 @@ const scheduleRefreshFromToken = (
 apiClient.interceptors.request.use(
   (config) => {
     try {
-      const { accessToken, isAuthenticated } = useAppStore.getState();
+      const { accessToken } = useAppStore.getState();
       if (accessToken && config.headers) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
@@ -149,7 +149,7 @@ apiClient.interceptors.request.use(
       if (xsrf && config.headers) {
         config.headers["X-XSRF-TOKEN"] = xsrf;
       }
-      if (isAuthenticated) {
+      if (accessToken) {
         scheduleRefreshFromToken(accessToken);
       }
     } catch (e) {}
@@ -164,8 +164,8 @@ apiClient.interceptors.response.use(
     const originalRequest = err.config as any;
     if (!originalRequest) return Promise.reject(err);
 
-    const { isAuthenticated } = useAppStore.getState();
-    if (!isAuthenticated) return Promise.reject(err);
+    const { isAuthenticated, accessToken } = useAppStore.getState();
+    if (!isAuthenticated && !accessToken) return Promise.reject(err);
 
     const status = err?.response?.status;
     const isRefreshRequest =
