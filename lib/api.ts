@@ -2,8 +2,12 @@ import axios from "axios";
 import useAppStore from "@/hooks/useAppStore";
 import { getCookie, parseJwtPayload } from "@/lib/utils";
 
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1"
+).replace(/\/$/, "");
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: API_BASE_URL,
 });
 
 const DEFAULT_REFRESH_INTERVAL_MS = 290000;
@@ -92,8 +96,7 @@ const refreshAccessToken = async () => {
     throw new Error("Missing XSRF-TOKEN");
   }
 
-  const refreshUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/refresh-token";
+  const refreshUrl = `${API_BASE_URL}/auth/refresh-token`;
   const xsrfHeaders = {
     "X-XSRF-TOKEN": xsrfToken,
     "X-CSRF-TOKEN": xsrfToken,
