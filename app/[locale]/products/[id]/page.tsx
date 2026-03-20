@@ -60,7 +60,15 @@ export default function ProductDetail({
   const { id } = use(params);
   const router = useRouter();
   const pathname = usePathname();
-  const { fetchProductById } = useProducts();
+  const { fetchProductById } = useProducts(
+    0,
+    10,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    false,
+  );
   const { addToCart } = useCart();
   const isAuthenticated = useAppStore((s) => s.isAuthenticated);
 

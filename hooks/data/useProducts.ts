@@ -106,12 +106,14 @@ export function useProducts(
   categoryId?: number,
   brandId?: number,
   keyword?: string,
-  isDesc?: boolean
+  isDesc?: boolean,
+  enableListQuery: boolean = true,
 ) {
   const qc = useQueryClient();
 
   const productsQuery = useQuery<Paging<Product>>({
     queryKey: ["products", page, size, categoryId, brandId, keyword, isDesc],
+    enabled: enableListQuery,
     queryFn: async (): Promise<Paging<Product>> => {
       const res = await apiClient.get("/products", {
         params: { page, size, categoryId, brandId, keyword, isDesc },
