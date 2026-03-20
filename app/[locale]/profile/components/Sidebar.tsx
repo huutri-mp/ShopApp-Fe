@@ -64,7 +64,7 @@ export default function Sidebar({
         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-6">
           <Avatar className="w-12 h-12">
             <AvatarImage
-              src={avatarPreview || user?.avatar || "avatar-placeholder.png"}
+              src={avatarPreview || user?.avatar || undefined}
               alt="avatar"
             />
             <AvatarFallback>

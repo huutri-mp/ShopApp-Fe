@@ -656,46 +656,6 @@ export default function ProductDetail({
             </TabsContent>
           </Tabs>
         </div>
-
-        {product.variants && product.variants.length > 1 && (
-          <div className="mt-6 bg-white rounded-lg p-4">
-            <h3 className="font-bold text-gray-900 mb-4">
-              {t("products.allVariants")}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {product.variants.map((variant, idx) => (
-                <button
-                  key={variant.id ?? idx}
-                  onClick={() => setSelectedVariant(variant)}
-                  className={cn(
-                    "p-3 rounded-lg border-2 text-left transition-colors",
-                    selectedVariant?.id === variant.id
-                      ? "border-red-600 bg-red-50"
-                      : "border-gray-200 hover:border-gray-400",
-                  )}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    {variant.attributes?.color && (
-                      <span
-                        className="w-4 h-4 rounded-full border"
-                        style={{ backgroundColor: variant.attributes.color }}
-                      />
-                    )}
-                    <span className="font-medium text-sm">
-                      {variant.skuCode ?? `Variant ${idx + 1}`}
-                    </span>
-                  </div>
-                  <div className="text-red-600 font-bold">
-                    {formatPriceText(variant.price)}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {t("products.stock")}: {variant.stock ?? 0}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

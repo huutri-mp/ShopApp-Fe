@@ -26,10 +26,7 @@ export default function ProfileHeader({
       <div className="flex items-center gap-6">
         <div className="relative group w-28 h-28">
           <Avatar className="w-full h-full cursor-pointer">
-            <AvatarImage
-              src={preview || "avatar-placeholder.png"}
-              alt="avatar"
-            />
+            <AvatarImage src={preview || undefined} alt="avatar" />
             <AvatarFallback>
               {(user.fullName || user.userName || "?")[0]}
             </AvatarFallback>

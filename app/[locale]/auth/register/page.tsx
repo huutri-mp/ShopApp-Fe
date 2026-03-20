@@ -295,13 +295,6 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   disabled={isLoading}
                 />
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </Button>
               </div>
             </div>
 

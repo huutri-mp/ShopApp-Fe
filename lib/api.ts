@@ -8,19 +8,39 @@ const apiClient = axios.create({
 
 const DEFAULT_REFRESH_INTERVAL_MS = 290000;
 const MIN_REFRESH_INTERVAL_MS = 10000;
-let refreshIntervalId: ReturnType<typeof setTimeout> | null = null;
-let isRefreshing = false;
-let failedQueue: Array<{
+type FailedQueueItem = {
   resolve: (value?: any) => void;
   reject: (error?: any) => void;
-}> = [];
+};
+
+type RefreshState = {
+  refreshIntervalId: ReturnType<typeof setTimeout> | null;
+  isRefreshing: boolean;
+  failedQueue: FailedQueueItem[];
+};
+
+declare global {
+  var __shopAppRefreshState__: RefreshState | undefined;
+}
+
+const refreshState: RefreshState =
+  globalThis.__shopAppRefreshState__ ??
+  (globalThis.__shopAppRefreshState__ = {
+    refreshIntervalId: null,
+    isRefreshing: false,
+    failedQueue: [],
+  });
 
 const resolveRefreshIntervalMs = (token?: string | null): number => {
-  const payload = parseJwtPayload(token);
-  const expirationTime = payload?.expirationTime;
+  const payload = parseJwtPayload<{ exp?: number; expirationTime?: number }>(
+    token,
+  );
+  const rawExpiry = payload?.exp ?? payload?.expirationTime;
 
-  if (typeof expirationTime === "number") {
-    const remainingMs = expirationTime - Date.now();
+  if (typeof rawExpiry === "number") {
+    const expirationMs =
+      rawExpiry < 1_000_000_000_000 ? rawExpiry * 1000 : rawExpiry;
+    const remainingMs = expirationMs - Date.now();
     return Math.max(
       Math.min(remainingMs, DEFAULT_REFRESH_INTERVAL_MS),
       MIN_REFRESH_INTERVAL_MS,
@@ -31,19 +51,19 @@ const resolveRefreshIntervalMs = (token?: string | null): number => {
 };
 
 const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
+  refreshState.failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
     else prom.resolve(token);
   });
-  failedQueue = [];
+  refreshState.failedQueue = [];
 };
 
 const refreshAccessToken = async () => {
   const xsrfToken = getCookie("XSRF-TOKEN");
   if (!xsrfToken) {
-    if (refreshIntervalId) {
-      clearTimeout(refreshIntervalId);
-      refreshIntervalId = null;
+    if (refreshState.refreshIntervalId) {
+      clearTimeout(refreshState.refreshIntervalId);
+      refreshState.refreshIntervalId = null;
     }
     throw new Error("Missing XSRF-TOKEN");
   }
@@ -76,27 +96,30 @@ const scheduleRefreshFromToken = (
   if (typeof window === "undefined") return;
   const { isAuthenticated } = useAppStore.getState();
   if (!isAuthenticated) {
-    if (refreshIntervalId) {
-      clearTimeout(refreshIntervalId);
-      refreshIntervalId = null;
+    if (refreshState.refreshIntervalId) {
+      clearTimeout(refreshState.refreshIntervalId);
+      refreshState.refreshIntervalId = null;
     }
     return;
   }
-  if (refreshIntervalId && !force) return;
+  if (refreshState.refreshIntervalId && !force) return;
   if (!getCookie("XSRF-TOKEN")) return;
 
-  if (refreshIntervalId) {
-    clearTimeout(refreshIntervalId);
-    refreshIntervalId = null;
+  if (refreshState.refreshIntervalId) {
+    clearTimeout(refreshState.refreshIntervalId);
+    refreshState.refreshIntervalId = null;
   }
 
   const intervalMs = resolveRefreshIntervalMs(
     token ?? useAppStore.getState().accessToken,
   );
 
-  refreshIntervalId = setTimeout(() => {
-    if (isRefreshing) return;
-    isRefreshing = true;
+  refreshState.refreshIntervalId = setTimeout(() => {
+    if (refreshState.isRefreshing) {
+      scheduleRefreshFromToken(token, true);
+      return;
+    }
+    refreshState.isRefreshing = true;
     void refreshAccessToken()
       .then((token) => {
         processQueue(null, token);
@@ -110,7 +133,7 @@ const scheduleRefreshFromToken = (
           window.dispatchEvent(new Event("auth-changed"));
       })
       .finally(() => {
-        isRefreshing = false;
+        refreshState.isRefreshing = false;
       });
   }, intervalMs);
 };
@@ -138,11 +161,20 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (res) => res,
   async (err) => {
-    const originalRequest = err.config;
+    const originalRequest = err.config as any;
     if (!originalRequest) return Promise.reject(err);
 
     const { isAuthenticated } = useAppStore.getState();
     if (!isAuthenticated) return Promise.reject(err);
+
+    const status = err?.response?.status;
+    const isRefreshRequest =
+      typeof originalRequest?.url === "string" &&
+      originalRequest.url.includes("/auth/refresh-token");
+
+    if (status !== 401 || isRefreshRequest || originalRequest._retry) {
+      return Promise.reject(err);
+    }
 
     originalRequest._retry = true;
 
@@ -156,9 +188,9 @@ apiClient.interceptors.response.use(
       return Promise.reject(err);
     }
 
-    if (isRefreshing) {
+    if (refreshState.isRefreshing) {
       return new Promise(function (resolve, reject) {
-        failedQueue.push({ resolve, reject });
+        refreshState.failedQueue.push({ resolve, reject });
       })
         .then((token) => {
           if (token && originalRequest.headers)
@@ -168,7 +200,7 @@ apiClient.interceptors.response.use(
         .catch((e) => Promise.reject(e));
     }
 
-    isRefreshing = true;
+    refreshState.isRefreshing = true;
 
     try {
       const newToken = await refreshAccessToken();
@@ -186,7 +218,7 @@ apiClient.interceptors.response.use(
         window.dispatchEvent(new Event("auth-changed"));
       return Promise.reject(e);
     } finally {
-      isRefreshing = false;
+      refreshState.isRefreshing = false;
     }
 
     return Promise.reject(err);
