@@ -1,6 +1,4 @@
-Thẻ test VNPay
-Ngân hàng	NCB
-Số thẻ	9704198526191432198
-Tên chủ thẻ	NGUYEN VAN A
-Ngày phát hành	07/15
-Mật khẩu OTP	123456
+Thẻ test VNPay: 
+| Ngân hàng | Số thẻ | Tên chủ thẻ | OTP |
+| :--- | :--- | :--- | :--- |
+| **NCB** | 9704198526191432198 | NGUYEN VAN A | 123456 |
